@@ -1,0 +1,15 @@
+# Compiled class file
+*.class
+
+# compile target folders
+target/
+bin/
+class/
+classes/
+
+# Log file
+*.log
+
+
+# virtual machine crash logs
+hs_err_pid* 

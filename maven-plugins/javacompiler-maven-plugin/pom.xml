@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>xyz.kemix.maven.plugins</groupId>
+		<artifactId>maven-plugins-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../</relativePath>
+	</parent>
+	<artifactId>javacompiler-maven-plugin</artifactId>
+	<packaging>maven-plugin</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>xyz.kemix.maven.plugins</groupId>
+			<artifactId>maven-plugin-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>xyz.kemix.java.bundles</groupId>
+			<artifactId>java-bundle-helper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-io</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+	</dependencies>
+
+</project>
