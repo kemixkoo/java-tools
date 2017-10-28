@@ -19,8 +19,8 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import xyz.kemix.java.io.FileExts;
 import xyz.kemix.java.io.UTFFileHandler;
-import xyz.kemix.java.io.ZipFileUtil;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -43,7 +43,7 @@ public class ManifestUtil {
 			return null;
 		}
 
-		if (!zipEntry.getName().endsWith(ZipFileUtil.EXT_JAR)) {
+		if (!FileExts.JAR.of(zipEntry.getName())) {
 			return null;
 		}
 		Manifest manifest = null;
@@ -77,7 +77,7 @@ public class ManifestUtil {
 			return null;
 		}
 
-		if (!file.getName().endsWith(ZipFileUtil.EXT_JAR)) {
+		if (!FileExts.JAR.of(file.getName())) {
 			return null;
 		}
 		Manifest manifest = null;

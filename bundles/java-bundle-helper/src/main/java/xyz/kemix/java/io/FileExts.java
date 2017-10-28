@@ -1,6 +1,8 @@
 
 package xyz.kemix.java.io;
 
+import java.io.File;
+
 /**
  * @author Kemix Koo <kemix_koo@163.com>
  *
@@ -38,10 +40,14 @@ public enum FileExts {
 		return file != null && file.toLowerCase().endsWith(ext());
 	}
 
+	public static FileExts get(File file) {
+		return file == null ? null : get(file.getName());
+	}
+
 	public static FileExts get(String file) {
 		if (file != null) {
 			for (FileExts fe : FileExts.values()) {
-				if (file.toLowerCase().endsWith(fe.ext())) {
+				if (fe.of(file)) {
 					return fe;
 				}
 			}

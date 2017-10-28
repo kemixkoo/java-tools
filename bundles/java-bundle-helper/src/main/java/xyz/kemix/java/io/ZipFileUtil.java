@@ -26,10 +26,6 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 public class ZipFileUtil {
-	public static final String ZIP = "zip";
-	public static final String JAR = "jar";
-	public static final String EXT_ZIP = "." + ZIP;
-	public static final String EXT_JAR = "." + JAR;
 
 	/**
 	 * 
@@ -42,7 +38,7 @@ public class ZipFileUtil {
 		}
 		File targetZip = target;
 		if (target.exists() && target.isDirectory()) {
-			targetZip = new File(target, source.getName() + EXT_ZIP);
+			targetZip = new File(target, source.getName() + FileExts.ZIP.ext());
 		}
 		if (source.isDirectory()) {
 			zip(source.listFiles(), targetZip);
@@ -121,7 +117,7 @@ public class ZipFileUtil {
 		if (!zip.isFile()) {
 			throw new IOException("Must be file:" + zip);
 		}
-		if (!zip.getName().endsWith(EXT_ZIP) && !zip.getName().endsWith(EXT_JAR)) {
+		if (!FileExts.ZIP.of(zip.getName()) && !FileExts.JAR.of(zip.getName())) {
 			throw new IOException("Invalid compress file:" + zip);
 		}
 

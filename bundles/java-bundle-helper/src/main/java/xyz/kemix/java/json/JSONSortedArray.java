@@ -15,8 +15,6 @@ import org.json.JSONArray;
  *
  */
 public class JSONSortedArray extends JSONArray {
-	public static boolean console = false;
-	public static int consoleRowLimit = -1;
 
 	public JSONSortedArray() {
 		super();
@@ -24,15 +22,6 @@ public class JSONSortedArray extends JSONArray {
 
 	public JSONSortedArray(Collection<?> collection) {
 		super(collection);
-	}
-
-	@Override
-	public int length() {
-		int length = super.length();
-		if (console && consoleRowLimit > 1 && length > consoleRowLimit) {
-			return consoleRowLimit;
-		}
-		return length;
 	}
 
 	public void sort() {

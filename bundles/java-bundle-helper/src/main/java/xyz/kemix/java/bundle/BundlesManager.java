@@ -25,6 +25,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 
+import xyz.kemix.java.io.FileExts;
 import xyz.kemix.java.io.ZipFileUtil;
 
 /**
@@ -65,7 +66,7 @@ public class BundlesManager {
 					try {
 						Manifest manifest = null;
 						// must be jar
-						if (f.isFile() && f.getName().endsWith(ZipFileUtil.EXT_JAR)) {
+						if (f.isFile() && FileExts.JAR.of(f.getName())) {
 							manifest = ManifestUtil.getJarManifest(f);
 
 						} else if (f.isDirectory()) { // support folder
@@ -115,7 +116,7 @@ public class BundlesManager {
 		for (File bundle : bundlesFiles) {
 			if (bundle.isDirectory()) {
 				if (packFolder) {
-					File targetJarFile = new File(targetFolder, bundle.getName() + ZipFileUtil.EXT_JAR);
+					File targetJarFile = new File(targetFolder, bundle.getName() + FileExts.JAR.ext());
 					ZipFileUtil.zip(bundle, targetJarFile);
 				} else {
 					FileUtils.copyDirectoryToDirectory(bundle, targetFolder);
@@ -142,9 +143,9 @@ public class BundlesManager {
 		if (file.isDirectory()) {
 			return listBundlesFromFolder(file);
 		} else if (file.isFile()) {
-			if (file.getName().endsWith(ZipFileUtil.EXT_ZIP)) {
+			if (FileExts.ZIP.of(file.getName())) {
 				return listBundlesFromZip(file);
-			} else if (file.getName().endsWith(ZipFileUtil.EXT_JAR)) {
+			} else if (FileExts.JAR.of(file.getName())) {
 				return listBundlesFromJar(file);
 			}
 		}
@@ -158,7 +159,7 @@ public class BundlesManager {
 		}
 		Map<String, String> results = new HashMap<String, String>();
 		// jars
-		Iterator jarFiles = FileUtils.iterateFiles(bundlesFolder, new String[] { ZipFileUtil.JAR }, false);
+		Iterator jarFiles = FileUtils.iterateFiles(bundlesFolder, new String[] { FileExts.JAR.n() }, false);
 		while (jarFiles.hasNext())
 			results.putAll(listBundlesFromJar((File) jarFiles.next()));
 
@@ -185,7 +186,7 @@ public class BundlesManager {
 				if (!zipEntry.isDirectory()) {
 					String path = zipEntry.getName();
 					Manifest manifest = null;
-					if (path.endsWith(ZipFileUtil.EXT_JAR)) {
+					if (FileExts.JAR.of(path)) {
 						manifest = ManifestUtil.getZipJarManifest(zip, zipEntry);
 
 					} else if (path.endsWith(JarFile.MANIFEST_NAME)) {

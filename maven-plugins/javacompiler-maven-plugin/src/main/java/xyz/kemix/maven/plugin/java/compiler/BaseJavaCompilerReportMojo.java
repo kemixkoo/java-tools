@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -13,11 +11,12 @@ import org.apache.commons.lang3.JavaVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.components.io.resources.PlexusIoFileResourceCollection;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
-import xyz.kemix.java.json.JSONSortedArray;
+import xyz.kemix.java.io.ZipFileUtil;
 import xyz.kemix.maven.plugin.core.AbstractBaseMojo;
 
 /**
@@ -30,7 +29,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 
 	private static final String[] DEFAULT_EXCLUDES = new String[] { "**/package.html" };
 
-	private static final String[] DEFAULT_INCLUDES = new String[] { "**/*." + ClassReporterHelper.EXT_CLASS };
+	private static final String[] DEFAULT_INCLUDES = new String[] { "**/*." + FileExts.CLASS.ext() };
 	/**
 	 * Location of the checking file.
 	 */
@@ -71,6 +70,8 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 
 	/**
 	 * enable to limit the result in console for array
+	 * 
+	 * if -1, will be no limit. currently, 20 by default
 	 */
 	@Parameter(defaultValue = "20", property = "java.compiler.console.limit")
 	private int consoleLimit;
@@ -85,14 +86,14 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	 * List of files to include. Specified as fileset patterns which are relative to
 	 * the input directory
 	 */
-	@Parameter
+	// @Parameter
 	private String[] includes;
 
 	/**
 	 * List of files to exclude. Specified as fileset patterns which are relative to
 	 * the input directory
 	 */
-	@Parameter
+	// @Parameter
 	private String[] excludes;
 
 	/**
@@ -101,20 +102,8 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	@Parameter(defaultValue = "${project.build.directory}/working_report", readonly = true)
 	private File tempWorkDir;
 
-	protected static final Map<String, JavaVersion> JAVA_VERSIONS = new HashMap<>();
-
 	protected File getTempWorkDir() {
 		return tempWorkDir;
-	}
-
-	protected JavaVersion getBaseJavaVersion() {
-		if (JAVA_VERSIONS.isEmpty()) {
-			JAVA_VERSIONS.put("1.6", JavaVersion.JAVA_1_6);
-			JAVA_VERSIONS.put("1.7", JavaVersion.JAVA_1_7);
-			JAVA_VERSIONS.put("1.8", JavaVersion.JAVA_1_8);
-			JAVA_VERSIONS.put("9", JavaVersion.JAVA_9);
-		}
-		return JAVA_VERSIONS.get(javaVersion);
 	}
 
 	private String[] getIncludes() {
@@ -146,57 +135,62 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	}
 
 	@Override
-	protected void beforeExecute() throws MojoExecutionException, MojoFailureException {
-		super.beforeExecute();
-
+	protected void doExecute() throws MojoExecutionException, MojoFailureException {
+		JSONArray result = new JSONArray();
 		try {
+			startStep("Starting to check compiler version of classes");
+
+			// TODO, Will support it later
+			// final PlexusIoFileResourceCollection collection = new
+			// PlexusIoFileResourceCollection();
+			// collection.setIncludes(getIncludes());
+			// collection.setExcludes(getExcludes());
+			// collection.setBaseDir(baseBundlesFolder);
+
+			ClassReporterHelper helper = new ClassReporterHelper(CompilerVersion.get(javaVersion), compatible,
+					classesLimit, false);
+
 			if (checkingFile.isFile()) {
-				String name = checkingFile.getName();
-				if (FileExts.ZIP.of(name)) {
+				FileExts fileExts = FileExts.get(checkingFile);
+				if (fileExts != null) {
+					switch (fileExts) {
+					case CLASS:
 
-				} else if (FileExts.WAR.of(name)) {
-
-				} else if (FileExts.TAR.of(name) || FileExts.TAR_GZ.of(name)) {
-
-				} else if (FileExts.JAR.of(name)) {
-
-				} else if (FileExts.CLASS.of(name)) {
-					FileUtils.copyFileToDirectory(checkingFile, tempWorkDir);
-				} else {
-					throw new MojoExecutionException("Invalid file: " + checkingFile);
+						// TODO
+						break;
+					case JAR:
+						JSONObject json = helper.processJarBundle(null, checkingFile);
+						result.put(json);
+						break;
+					case ZIP:
+						File workDir = getTempWorkDir();
+						ZipFileUtil.unzip(checkingFile, workDir);
+						result = helper.processFiles(null, workDir.listFiles());
+						break;
+					case TAR:
+					case TAR_GZ:
+						// TODO
+						break;
+					case WAR:
+						// TODO
+						break;
+					default:
+						throw new IOException("Don't support this file type:" + checkingFile);
+					}
 				}
-			} else if (checkingFile.isDirectory()) {
 
+			} else if (checkingFile.isDirectory()) {
+				// only process the first level
+				// need recursive?
+				result = helper.processFiles(null, checkingFile.listFiles());
 			}
-		} catch (IOException e) {
+
+			finishStep();
+		} catch (Exception e) {
 			throw new MojoExecutionException("Can't process the source file before checking :" + checkingFile, e);
 		}
 
-	}
-
-	@Override
-	protected void doExecute() throws MojoExecutionException, MojoFailureException {
-		File baseBundlesFolder = getTempWorkDir();
-		File[] listFiles = baseBundlesFolder.listFiles();
-		if (listFiles == null) {
-			throw new MojoExecutionException("Can't find any files to check.");
-		}
-
-		final PlexusIoFileResourceCollection collection = new PlexusIoFileResourceCollection();
-		collection.setIncludes(getIncludes());
-		collection.setExcludes(getExcludes());
-		collection.setBaseDir(baseBundlesFolder);
-
-		startStep("Starting to check compiler version of classes");
-		JSONArray result = null;
-		try {
-			ClassReporterHelper helper = new ClassReporterHelper(getBaseJavaVersion(), compatible, classesLimit, false);
-			result = helper.processFiles(null, listFiles);
-			finishStep();
-		} catch (IOException e) {
-			throw new MojoExecutionException("Can't process the plugins", e);
-		}
-		if (result.length() == 0) {
+		if (result == null || result.length() == 0) {
 			getLog().info("");
 			getLog().info("##########################################");
 			getLog().info("             All compatible!");
@@ -204,22 +198,20 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 			getLog().info("");
 		} else {
 			if (console) {
-				try {
-					JSONSortedArray.console = true;
-					JSONSortedArray.consoleRowLimit = consoleLimit;
-
-					System.out.println();
-					System.out.println();
-					System.out.println("Some classes are different compiler version:");
-					System.out.println();
-					result.write(new OutputStreamWriter(System.out), 4, 0);
-					System.out.println();
-					System.out.println();
-				} finally {
-					JSONSortedArray.console = false;
-					JSONSortedArray.consoleRowLimit = -1;
+				JSONArray consoleArray = new JSONArray();
+				for (int i = 0; i < result.length() && (consoleLimit == -1 || i < consoleLimit); i++) {
+					consoleArray.put(consoleArray.get(i));
 				}
+				System.out.println();
+				System.out.println();
+				System.out.println("Some classes are different compiler version:");
+				System.out.println();
+				consoleArray.write(new OutputStreamWriter(System.out), 4, 0);
+				System.out.println();
+				System.out.println();
 			}
+
+			// record to report file
 			if (reportFile != null) {
 				try {
 					FileUtils.forceMkdir(reportFile.getParentFile());

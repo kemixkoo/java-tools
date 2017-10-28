@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.kemix.java.bundle.BundleVersion;
 import xyz.kemix.java.bundle.BundlesManager;
 import xyz.kemix.java.bundle.ManifestUtil;
-import xyz.kemix.java.io.ZipFileUtil;
+import xyz.kemix.java.io.FileExts;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -50,7 +50,7 @@ public class EclipsePluginsManager extends BundlesManager {
 		}
 
 		// jars
-		Iterator jarFiles = FileUtils.iterateFiles(pluginsFolder, new String[] { ZipFileUtil.JAR }, false);
+		Iterator jarFiles = FileUtils.iterateFiles(pluginsFolder, new String[] { FileExts.JAR.n() }, false);
 		while (jarFiles.hasNext())
 			results.putAll(listBundlesFromJar((File) jarFiles.next()));
 
