@@ -36,12 +36,16 @@ public enum FileExts {
 		return '.' + n();
 	}
 
+	public boolean of(File file) {
+		return file != null && file.isFile() && of(file.getName());
+	}
+
 	public boolean of(String file) {
 		return file != null && file.toLowerCase().endsWith(ext());
 	}
 
 	public static FileExts get(File file) {
-		return file == null ? null : get(file.getName());
+		return file != null && file.isFile() ? get(file.getName()) : null;
 	}
 
 	public static FileExts get(String file) {

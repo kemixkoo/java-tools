@@ -20,7 +20,7 @@ public enum CompilerVersion {
 	JAVA_1_8("1.8"), //
 	JAVA_9("9"),//
 	;
-	private static final int INIT_VALUE = 45; // 1.1
+	private static final int INIT_VALUE = 45; // 1.1 ,02D
 
 	private final String name;
 

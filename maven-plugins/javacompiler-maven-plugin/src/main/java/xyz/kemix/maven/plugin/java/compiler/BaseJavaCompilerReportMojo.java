@@ -12,12 +12,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
 import xyz.kemix.java.io.ZipFileUtil;
 import xyz.kemix.maven.plugin.core.AbstractBaseMojo;
+import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -33,8 +33,8 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	/**
 	 * Location of the checking file.
 	 */
-	@Parameter(property = "java.compiler.checkingFile", required = true)
-	private File checkingFile;
+	@Parameter(property = "java.compiler.source.path", required = true)
+	private File sourcePath;
 
 	/**
 	 * the base Compiler version to classes of plugins.
@@ -43,8 +43,8 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	 * 
 	 * {@link JavaVersion}
 	 */
-	@Parameter(defaultValue = "1.7", property = "java.compiler.version")
-	private String javaVersion;
+	@Parameter(defaultValue = "1.7", property = "java.compiler.baseVersion")
+	private String baseVersion;
 	/**
 	 * enable to compatible the Compiler version,
 	 * 
@@ -102,6 +102,10 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	@Parameter(defaultValue = "${project.build.directory}/working_report", readonly = true)
 	private File tempWorkDir;
 
+	protected File getSourcePath() {
+		return sourcePath;
+	}
+
 	protected File getTempWorkDir() {
 		return tempWorkDir;
 	}
@@ -124,15 +128,18 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	protected void validateParameters() throws MojoExecutionException, MojoFailureException {
 		super.validateParameters();
 
-		if (!checkingFile.exists()) {
-			throw new MojoExecutionException("Patch file is not existed: " + checkingFile);
+		if (!sourcePath.exists()) {
+			throw new MojoExecutionException("Patch file is not existed: " + sourcePath);
 		}
 
 		if (reportFile != null && reportFile.getName().equals(".")) {
-			reportFile = new File(checkingFile.getParentFile(),
-					FilenameUtils.getBaseName(checkingFile.getName() + FileExts.JSON.ext()));
+			reportFile = new File(sourcePath.getParentFile(),
+					FilenameUtils.getBaseName(sourcePath.getName() + FileExts.JSON.ext()));
 		}
 	}
+
+	protected abstract BaseClassReporter createClassReporter(CompilerVersion baseJDKVersion,
+			boolean compatibleJDKVersion, int maxClasses, boolean innerJar);
 
 	@Override
 	protected void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -147,25 +154,23 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 			// collection.setExcludes(getExcludes());
 			// collection.setBaseDir(baseBundlesFolder);
 
-			ClassReporterHelper helper = new ClassReporterHelper(CompilerVersion.get(javaVersion), compatible,
-					classesLimit, false);
+			BaseClassReporter helper = createClassReporter(CompilerVersion.get(baseVersion), compatible, classesLimit,
+					false);
 
-			if (checkingFile.isFile()) {
-				FileExts fileExts = FileExts.get(checkingFile);
+			if (sourcePath.isFile()) {
+				FileExts fileExts = FileExts.get(sourcePath);
 				if (fileExts != null) {
 					switch (fileExts) {
 					case CLASS:
-
-						// TODO
+						result = helper.processClass(sourcePath);
 						break;
 					case JAR:
-						JSONObject json = helper.processJarBundle(null, checkingFile);
-						result.put(json);
+						result = helper.processJar(sourcePath);
 						break;
 					case ZIP:
 						File workDir = getTempWorkDir();
-						ZipFileUtil.unzip(checkingFile, workDir);
-						result = helper.processFiles(null, workDir.listFiles());
+						ZipFileUtil.unzip(sourcePath, workDir);
+						result = helper.processFolder(workDir);
 						break;
 					case TAR:
 					case TAR_GZ:
@@ -175,19 +180,17 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 						// TODO
 						break;
 					default:
-						throw new IOException("Don't support this file type:" + checkingFile);
+						throw new IOException("Don't support this file type:" + sourcePath);
 					}
 				}
 
-			} else if (checkingFile.isDirectory()) {
-				// only process the first level
-				// need recursive?
-				result = helper.processFiles(null, checkingFile.listFiles());
+			} else if (sourcePath.isDirectory()) {
+				result = helper.processFolder(sourcePath);
 			}
 
 			finishStep();
 		} catch (Exception e) {
-			throw new MojoExecutionException("Can't process the source file before checking :" + checkingFile, e);
+			throw new MojoExecutionException("Can't process the source file before checking :" + sourcePath, e);
 		}
 
 		if (result == null || result.length() == 0) {

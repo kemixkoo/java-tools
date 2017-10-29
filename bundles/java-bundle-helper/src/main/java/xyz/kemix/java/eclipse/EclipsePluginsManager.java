@@ -6,19 +6,24 @@ package xyz.kemix.java.eclipse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.AbstractFileFilter;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.lang3.StringUtils;
 
 import xyz.kemix.java.bundle.BundleVersion;
@@ -37,7 +42,49 @@ public class EclipsePluginsManager extends BundlesManager {
 	public static final String NAME_CONTENT = "content";
 	public static final String FOLDER_PLUGINS = "plugins";
 
-	@SuppressWarnings("rawtypes")
+	/**
+	 * must have "plugins" sub-folder.
+	 * 
+	 * @return the plugins jar files or the plugin folders.
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Collection<File> listPluginsFilesFromProduct(File productFolder) throws IOException {
+		if (productFolder == null || !productFolder.exists()) {
+			return Collections.emptyList();
+		}
+		Set<File> results = new HashSet<File>();
+
+		File pluginsFolder = new File(productFolder, FOLDER_PLUGINS);
+		if (!pluginsFolder.exists()) {
+			return Collections.emptyList();
+		}
+		// jars
+		Collection jarFiles = FileUtils.listFiles(pluginsFolder, new String[] { FileExts.JAR.n() }, false);
+		if (jarFiles != null)
+			results.addAll(jarFiles);
+
+		// folders
+		Collection folderBundles = FileUtils.listFiles(pluginsFolder, FalseFileFilter.INSTANCE,
+				new AbstractFileFilter() {
+
+					@Override
+					public boolean accept(File file) {
+						return new File(file, JarFile.MANIFEST_NAME).exists();
+					}
+
+				});
+		if (folderBundles != null) {
+			results.addAll(folderBundles);
+		}
+		return results;
+	}
+
+	/**
+	 * 
+	 * must have "plugins" sub-folder.
+	 * 
+	 * @return the bundle name with version map
+	 */
 	public Map<String, String> listPluginsFromProduct(File productFolder) throws IOException {
 		if (productFolder == null || !productFolder.exists()) {
 			return Collections.emptyMap();
@@ -49,34 +96,24 @@ public class EclipsePluginsManager extends BundlesManager {
 			return Collections.emptyMap();
 		}
 
-		// jars
-		Iterator jarFiles = FileUtils.iterateFiles(pluginsFolder, new String[] { FileExts.JAR.n() }, false);
-		while (jarFiles.hasNext())
-			results.putAll(listBundlesFromJar((File) jarFiles.next()));
-
-		// folders with MANIFEST.MF
-		Iterator menifestFiles = FileUtils.iterateFiles(pluginsFolder, new NameFileFilter(MANIFEST_FILE_NAME) {
-
-			@Override
-			public boolean accept(File file) {
-				boolean valid = super.accept(file);
-				if (valid) {
-					return file.getParent().equals(MANIFEST_FOLDER_NAME);
+		Collection<File> pluginsFiles = listPluginsFilesFromProduct(productFolder);
+		for (File plugin : pluginsFiles) {
+			if (FileExts.JAR.of(plugin)) {
+				results.putAll(listBundlesFromJar(plugin));
+			} else if (plugin.isDirectory()) {
+				File menifestFile = new File(plugin, JarFile.MANIFEST_NAME);
+				if (menifestFile.exists()) {
+					results.putAll(listBundlesFromManifest(menifestFile));
 				}
-				return valid;
 			}
+		}
 
-			@Override
-			public boolean accept(File file, String name) {
-				return accept(new File(file, name));
-			}
-
-		}, null);
-		while (menifestFiles.hasNext())
-			results.putAll(listBundlesFromManifest((File) menifestFiles.next()));
 		return results;
 	}
 
+	/**
+	 * return the bundle version.
+	 */
 	@SuppressWarnings("rawtypes")
 	public String retrieveBundleVersion(File pluginsFolder, IOFileFilter bundleFilter) throws Exception {
 		String version = null;

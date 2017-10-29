@@ -18,7 +18,7 @@ import xyz.kemix.java.io.FileExts;
  *         Created at 2017-10-28
  *
  */
-public class ClassCompiler {
+public class ClassCompilerUtil {
 	public static CompilerVersion getJavaVersion(File file) throws IOException {
 		if (file == null) {
 			throw new NullPointerException();

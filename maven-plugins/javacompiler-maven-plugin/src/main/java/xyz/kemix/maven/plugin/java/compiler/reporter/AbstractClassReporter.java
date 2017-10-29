@@ -1,7 +1,7 @@
 /**
  * 
  */
-package xyz.kemix.maven.plugin.java.compiler;
+package xyz.kemix.maven.plugin.java.compiler.reporter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,8 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
@@ -21,9 +21,10 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import xyz.kemix.java.ClassCompiler;
+import xyz.kemix.java.ClassCompilerUtil;
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.bundle.BundlesManager;
+import xyz.kemix.java.bundle.ManifestUtil;
 import xyz.kemix.java.io.FileExts;
 import xyz.kemix.java.json.JSONLinkedObject;
 import xyz.kemix.java.json.JSONSortedArray;
@@ -34,9 +35,7 @@ import xyz.kemix.java.json.JSONSortedArray;
  *         Created at 2017-10-28
  *
  */
-public class ClassReporterHelper {
-	public static final String EXT_CLASS = "class";
-
+public class AbstractClassReporter {
 	public static final String CHAR_INNER_CLASS = "$";
 
 	public static final String KEY_FILE_PATH = "FilePath";
@@ -55,7 +54,7 @@ public class ClassReporterHelper {
 
 	private int number;
 
-	public ClassReporterHelper(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion, int maxClasses,
+	AbstractClassReporter(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion, int maxClasses,
 			boolean innerJar) {
 		super();
 		this.baseCompilerVersion = baseJDKVersion;
@@ -105,6 +104,10 @@ public class ClassReporterHelper {
 		return bundleFile.getName();
 	}
 
+	boolean validJarBundle(ZipFile jarFile) {
+		return true;
+	}
+
 	JSONObject processJarBundle(File baseFile, File bundleFile) throws IOException {
 		if (bundleFile == null || !bundleFile.exists()) {
 			return null;
@@ -118,8 +121,7 @@ public class ClassReporterHelper {
 		ZipFile jarFile = null;
 		try {
 			jarFile = new ZipFile(bundleFile);
-			ZipArchiveEntry manifestEntry = jarFile.getEntry(JarFile.MANIFEST_NAME);
-			if (manifestEntry == null) { // not jar
+			if (validJarBundle(jarFile)) { // not jar
 				return null;
 			}
 			Enumeration<ZipArchiveEntry> entries = jarFile.getEntries();
@@ -127,7 +129,7 @@ public class ClassReporterHelper {
 				ZipArchiveEntry entry = entries.nextElement();
 				if (!entry.isDirectory()) {
 					String path = entry.getName();
-					if (path.endsWith(EXT_CLASS)) { // class
+					if (FileExts.CLASS.of(path)) { // class
 						String basename = FilenameUtils.getBaseName(path);
 						if (basename.contains(CHAR_INNER_CLASS)) {
 							continue;
@@ -171,28 +173,24 @@ public class ClassReporterHelper {
 		if (detailsJson.length() == 0) { // no classes
 			return null;
 		}
-
-		Map<String, String> bundleMap = bundlesManager.listBundlesFromJar(bundleFile);
-		if (bundleMap.isEmpty()) {
-			return null;
-		}
-		String bundleName = bundleMap.keySet().iterator().next();
-		String bundleVersion = bundleMap.get(bundleName);
-
+		Manifest fileManifest = ManifestUtil.getJarManifest(bundleFile);
 		// jar path
 		String jarPath = getRelativeFilePath(baseFile, bundleFile);
-		JSONObject bundleJson = createBundleJson(bundleName, bundleVersion, jarPath, detailsJson);
+		JSONObject bundleJson = createBundleJson(fileManifest, jarPath, detailsJson);
 
 		return bundleJson;
 	}
 
+	boolean validFolderBundle(File bundleFile) {
+		if (bundleFile == null || !bundleFile.exists()) {
+			return false;
+		}
+		return true;
+	}
+
 	@SuppressWarnings("unchecked")
 	JSONObject processFolderBundle(File baseFile, File bundleFile) throws IOException {
-		if (bundleFile == null || !bundleFile.exists()) {
-			return null;
-		}
-		File manifestFile = new File(bundleFile, JarFile.MANIFEST_NAME);
-		if (!manifestFile.exists()) {
+		if (validFolderBundle(bundleFile)) {
 			return null;
 		}
 		if (isLimit()) {
@@ -200,7 +198,7 @@ public class ClassReporterHelper {
 		}
 		JSONObject detailsJson = new JSONObject();
 
-		Iterator<File> classesFiles = FileUtils.iterateFiles(bundleFile, new String[] { EXT_CLASS }, true);
+		Iterator<File> classesFiles = FileUtils.iterateFiles(bundleFile, new String[] { FileExts.CLASS.n() }, true);
 		while (classesFiles.hasNext()) {
 			File classFile = (File) classesFiles.next();
 			if (classFile.getName().contains(CHAR_INNER_CLASS)) {
@@ -211,15 +209,7 @@ public class ClassReporterHelper {
 			}
 			number++;
 
-			final FileInputStream fis = new FileInputStream(classFile);
-
-			String classPath = classFile.getAbsolutePath().replace(bundleFile.getAbsolutePath(), "");
-			classPath = FilenameUtils.removeExtension(classPath);
-
-			final String message = "Can't process the class file:" + classFile.getName() + " for bundle:"
-					+ bundleFile.getName();
-
-			processClass(detailsJson, fis, classPath, message);
+			processClass(detailsJson, classFile, bundleFile);
 		}
 
 		if (innerJar) { //
@@ -265,18 +255,31 @@ public class ClassReporterHelper {
 			return null;
 		}
 
-		Map<String, String> bundleMap = bundlesManager.listBundlesFromManifest(manifestFile);
-		if (bundleMap.isEmpty()) {
-			return null;
-		}
-		String bundleName = bundleMap.keySet().iterator().next();
-		String bundleVersion = bundleMap.get(bundleName);
-
+		Manifest fileManifest = ManifestUtil.getFileManifest(new File(bundleFile, JarFile.MANIFEST_NAME));
 		// folder
 		String folderPath = getRelativeFilePath(baseFile, bundleFile);
-		JSONObject bundleJson = createBundleJson(bundleName, bundleVersion, folderPath, detailsJson);
+		JSONObject bundleJson = createBundleJson(fileManifest, folderPath, detailsJson);
 
 		return bundleJson;
+	}
+
+	void processClass(JSONObject detailsJson, File bundleFile, File classFile) throws IOException {
+		final FileInputStream fis = new FileInputStream(classFile);
+
+		String classPath = null;
+		String message = null;
+		if (bundleFile != null) { // relate to bundle
+			classPath = classFile.getAbsolutePath().replace(bundleFile.getAbsolutePath(), "");
+			message = "Can't process the class file:" + classFile.getName() + " for bundle:" + bundleFile.getName();
+
+		} else { // only file name
+			classPath = classFile.getName();
+			message = "Can't process the class file:" + classFile.getName();
+			;
+		}
+		classPath = FilenameUtils.removeExtension(classPath);
+
+		processClass(detailsJson, new FileInputStream(classFile), classPath, message);
 	}
 
 	private void processClass(JSONObject detailsJson, InputStream classStream, String classPath, String exceptionMessge)
@@ -306,12 +309,15 @@ public class ClassReporterHelper {
 		}
 	}
 
-	private JSONObject createBundleJson(String bundleName, String bundleVersion, String bundleFilePath,
-			JSONObject detailsJson) {
+	private JSONObject createBundleJson(Manifest manifest, String bundleFilePath, JSONObject detailsJson) {
 
 		JSONObject bundleJson = new JSONLinkedObject();
-		bundleJson.put(KEY_BUNDLE_NAME, bundleName);
-		bundleJson.put(KEY_BUNDLE_VERSION, bundleVersion);
+		if (manifest != null) {
+			String bundleSymbolicName = bundlesManager.getBundleSymbolicName(manifest);
+			String bundleVersion = bundlesManager.getBundleVersion(manifest);
+			bundleJson.put(KEY_BUNDLE_NAME, bundleSymbolicName);
+			bundleJson.put(KEY_BUNDLE_VERSION, bundleVersion);
+		}
 		bundleJson.put(KEY_FILE_PATH, bundleFilePath);
 
 		// calc the sum of classes
@@ -343,7 +349,7 @@ public class ClassReporterHelper {
 	}
 
 	private CompilerVersion getInvalidCompilerVersion(InputStream input) throws IOException {
-		CompilerVersion compilerVersion = ClassCompiler.getJavaVersion(input);
+		CompilerVersion compilerVersion = ClassCompilerUtil.getJavaVersion(input);
 		if (compilerVersion != null && baseCompilerVersion != null && !compilerVersion.equals(baseCompilerVersion)) {
 			int compareTo = compilerVersion.compareTo(baseCompilerVersion);
 			if (compareTo > 0 // bigger than
