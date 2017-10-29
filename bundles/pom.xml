@@ -2,13 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-        <groupId>xyz.kemix.java.tools</groupId>
-        <artifactId>java-tools-parent</artifactId>
-        <version>1.0.0</version>
+		<groupId>xyz.kemix.java.tools</groupId>
+		<artifactId>java-tools-parent</artifactId>
+		<version>1.0.0</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<groupId>xyz.kemix.java.bundles</groupId>
 	<artifactId>java-bundles-parent</artifactId>
 	<packaging>pom</packaging>
 
+	<modules>
+		<module>java-bundle-helper</module>
+	</modules>
 </project>

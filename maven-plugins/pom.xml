@@ -11,6 +11,11 @@
 	<artifactId>maven-plugins-parent</artifactId>
 	<packaging>pom</packaging>
 
+	<modules>
+		<module>maven-plugin-core</module>
+		<module>javacompiler-maven-plugin</module>
+	</modules>
+
 	<properties>
 		<maven.dependency.version>3.5.2</maven.dependency.version>
 		<maven.plugin.version>3.5</maven.plugin.version>
