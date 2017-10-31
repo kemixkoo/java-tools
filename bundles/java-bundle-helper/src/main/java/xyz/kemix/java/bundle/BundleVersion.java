@@ -254,4 +254,12 @@ public class BundleVersion implements Comparable<BundleVersion> {
 		return qualifier.compareTo(other.qualifier);
 	}
 
+	public BundleVersion clone(boolean withQualifier) {
+		if (withQualifier) {
+			return new BundleVersion(this.getMajor(), this.getMinor(), this.getMicro(), this.getQualifier());
+		} else {
+			return new BundleVersion(this.getMajor(), this.getMinor(), this.getMicro(), null);
+		}
+	}
+
 }

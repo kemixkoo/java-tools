@@ -130,9 +130,7 @@ public class EclipsePluginsManager extends BundlesManager {
 			if (bundleFilter == null || bundleFilter.accept(null, bundleName)) {
 				String bundleVersion = bundlesMap.get(bundleName);
 
-				BundleVersion v = new BundleVersion(bundleVersion);
-				BundleVersion withoutQualifier = new BundleVersion(v.getMajor(), v.getMinor(), v.getMicro());
-				String bundelV = withoutQualifier.toString();
+				String bundelV = new BundleVersion(bundleVersion).clone(false).toString();
 				if (version == null) {
 					version = bundelV;
 				} else if (!bundelV.equals(version)) {
