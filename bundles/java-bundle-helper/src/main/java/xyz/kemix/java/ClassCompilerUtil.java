@@ -23,7 +23,7 @@ public class ClassCompilerUtil {
 		if (file == null) {
 			throw new NullPointerException();
 		}
-		if (file.exists()) {
+		if (!file.exists()) {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
 		if (!file.isFile()) {

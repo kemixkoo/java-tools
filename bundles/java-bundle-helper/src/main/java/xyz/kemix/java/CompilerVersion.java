@@ -40,6 +40,10 @@ public enum CompilerVersion {
 		return INIT_VALUE + ordinal();
 	}
 
+	public String getHexValue() {
+		return Long.toHexString(getValue()).toUpperCase();
+	}
+
 	public String toString() {
 		return "Java" + ' ' + getName();
 	}

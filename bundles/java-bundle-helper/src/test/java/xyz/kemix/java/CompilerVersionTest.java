@@ -69,4 +69,11 @@ public class CompilerVersionTest {
 		assertEquals(CompilerVersion.JAVA_1_8, CompilerVersion.get(52));
 		assertEquals(CompilerVersion.JAVA_9, CompilerVersion.get(53));
 	}
+
+	// @Test
+	public void list() {
+		for (CompilerVersion v : CompilerVersion.values()) {
+			System.out.println(v.toString() + "  : " + v.getValue() + " | " + v.getHexValue());
+		}
+	}
 }
