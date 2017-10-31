@@ -94,14 +94,16 @@ public class AbstractClassReporter {
 		return bundlesArrays;
 	}
 
-	private String getRelativeFilePath(File baseFile, File bundleFile) {
-		if (bundleFile == null) {
+	private String getRelativeFilePath(File baseFile, File file) {
+		if (file == null) {
 			return null;
 		}
 		if (baseFile != null) {
-			return bundleFile.getAbsolutePath().replace(baseFile.getAbsolutePath(), "");
+			String path = baseFile.toPath().relativize(file.toPath()).toString();
+			path = path.replaceAll("\\\\", "/"); // unify
+			return path;
 		}
-		return bundleFile.getName();
+		return file.getName();
 	}
 
 	boolean validJarBundle(ZipFile jarFile) {
@@ -209,7 +211,7 @@ public class AbstractClassReporter {
 			}
 			number++;
 
-			processClass(detailsJson, classFile, bundleFile);
+			processClass(detailsJson, bundleFile, classFile);
 		}
 
 		if (innerJar) { //
@@ -263,20 +265,14 @@ public class AbstractClassReporter {
 		return bundleJson;
 	}
 
-	void processClass(JSONObject detailsJson, File bundleFile, File classFile) throws IOException {
-		final FileInputStream fis = new FileInputStream(classFile);
-
-		String classPath = null;
+	void processClass(JSONObject detailsJson, File baseFile, File classFile) throws IOException {
 		String message = null;
-		if (bundleFile != null) { // relate to bundle
-			classPath = classFile.getAbsolutePath().replace(bundleFile.getAbsolutePath(), "");
-			message = "Can't process the class file:" + classFile.getName() + " for bundle:" + bundleFile.getName();
-
+		if (baseFile != null) { // relate to bundle
+			message = "Can't process the class file:" + classFile.getName() + " for bundle:" + baseFile.getName();
 		} else { // only file name
-			classPath = classFile.getName();
 			message = "Can't process the class file:" + classFile.getName();
-			;
 		}
+		String classPath = getRelativeFilePath(baseFile, classFile);
 		classPath = FilenameUtils.removeExtension(classPath);
 
 		processClass(detailsJson, new FileInputStream(classFile), classPath, message);

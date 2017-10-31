@@ -61,4 +61,14 @@ public class EclipsePluginsClassReporter extends BaseClassReporter {
 		return processFiles(folder, FileUtils.convertFileCollectionToFileArray(pluginsFiles));
 	}
 
+	@Override
+	public JSONArray processClasses(File baseFile, File[] classesFiles) throws IOException {
+		throw new UnsupportedOperationException(); // don't support
+	}
+
+	@Override
+	public JSONArray processJars(File baseFile, File[] classesFiles) throws IOException {
+		throw new UnsupportedOperationException(); // don't support
+	}
+
 }

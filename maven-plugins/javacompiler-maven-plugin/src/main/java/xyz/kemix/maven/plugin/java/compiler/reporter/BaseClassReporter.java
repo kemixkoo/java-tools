@@ -21,7 +21,7 @@ import xyz.kemix.java.io.FileExts;
  *
  */
 @SuppressWarnings("rawtypes")
-public abstract class BaseClassReporter extends AbstractClassReporter {
+public class BaseClassReporter extends AbstractClassReporter {
 
 	public BaseClassReporter(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion, int maxClasses,
 			boolean innerJar) {
@@ -43,7 +43,9 @@ public abstract class BaseClassReporter extends AbstractClassReporter {
 		for (File classFile : classesFiles) {
 			processClass(detailsJson, baseFile, classFile);
 		}
-		result.put(detailsJson);
+		if (detailsJson.length() > 0) {
+			result.put(detailsJson);
+		}
 		return result;
 	}
 
