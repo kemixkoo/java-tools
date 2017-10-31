@@ -43,7 +43,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	 * 
 	 * {@link JavaVersion}
 	 */
-	@Parameter(defaultValue = "1.7", property = "java.compiler.baseVersion")
+	@Parameter(defaultValue = "1.8", property = "java.compiler.baseVersion")
 	private String baseVersion;
 	/**
 	 * enable to compatible the Compiler version,
@@ -79,7 +79,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 	/**
 	 * If provide, will report to one json file.
 	 */
-	@Parameter(property = "java.compiler.report.file")
+	@Parameter(defaultValue = "${project.build.directory}/report.json", property = "java.compiler.report.file")
 	private File reportFile;
 
 	/**

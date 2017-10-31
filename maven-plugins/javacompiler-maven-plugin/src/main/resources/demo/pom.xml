@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>xyz.kemix.maven.plugins.demo</groupId>
+	<artifactId>javacompiler-demo</artifactId>
+	<version>1.0.0</version>
+
+	<properties>
+		<javacompiler.version>1.0.0</javacompiler.version>
+		
+		<!-- settings of plugin for JavaCompiler -->
+		<!--  
+		<java.compiler.source.path>path/to/check</java.compiler.source.path>
+		<java.compiler.baseVersion>1.7</java.compiler.baseVersion>
+		<java.compiler.compatible>true</java.compiler.compatible>
+		<java.compiler.classes.limit>500</java.compiler.classes.limit>
+		<java.compiler.console>true</java.compiler.console>
+		<java.compiler.console.limit>50</java.compiler.console.limit>
+		<java.compiler.report.file>${basedir}/report.json</java.compiler.report.file>
+		-->
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>xyz.kemix.maven.plugins</groupId>
+				<artifactId>javacompiler-maven-plugin</artifactId>
+				<version>${javacompiler.version}</version>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>report</goal> <!-- If for eclipse plugins, goal is "plugins-report" -->
+						</goals>
+						<configuration>
+							<sourcePath>path/to/check</sourcePath>
+							
+							<baseVersion>1.7</baseVersion> <!-- 1.8, by default -->
+							<compatible>true</compatible> <!-- true, by default -->
+							
+							<classesLimit>500</classesLimit> <!-- -1, no limit by default -->
+							
+							<console>true</console> <!--  false, by default -->
+							<consoleLimit>50</consoleLimit> <!-- 20, by default -->
+							
+							<reportFile>${basedir}/report.json</reportFile> <!-- target, by default -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

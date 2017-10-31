@@ -66,6 +66,6 @@ public abstract class BaseClassReporter extends AbstractClassReporter {
 
 	public JSONArray processFolder(File folder) throws IOException {
 		Collection listFiles = FileUtils.listFiles(folder, new String[] { FileExts.JAR.n(), FileExts.CLASS.n() }, true);
-		return processFiles(folder, (File[]) listFiles.toArray());
+		return processFiles(folder, FileUtils.convertFileCollectionToFileArray(listFiles));
 	}
 }
