@@ -74,4 +74,16 @@ public enum CompilerVersion {
 		}
 		return null;
 	}
+
+	public static CompilerVersion getCurrent() {
+		String javaVersion = System.getProperty("java.version");
+		if (javaVersion != null) {
+			for (CompilerVersion cv : CompilerVersion.values()) {
+				if (javaVersion.startsWith(cv.getName())) {
+					return cv;
+				}
+			}
+		}
+		return null;
+	}
 }

@@ -15,7 +15,6 @@ import org.json.JSONArray;
 
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
-import xyz.kemix.java.io.ZipFileUtil;
 import xyz.kemix.maven.plugin.core.AbstractBaseMojo;
 import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
 
@@ -106,8 +105,24 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 		return sourcePath;
 	}
 
+	protected CompilerVersion getBaseVersion() {
+		return CompilerVersion.get(baseVersion);
+	}
+
+	protected boolean isCompatible() {
+		return compatible;
+	}
+
+	protected int getClassesLimit() {
+		return classesLimit;
+	}
+
 	protected File getTempWorkDir() {
 		return tempWorkDir;
+	}
+
+	protected boolean needInner() {
+		return false;
 	}
 
 	private String[] getIncludes() {
@@ -143,7 +158,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException, MojoFailureException {
-		JSONArray result = new JSONArray();
+		JSONArray result = null;
 		try {
 			startStep("Starting to check compiler version of classes");
 
@@ -154,39 +169,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 			// collection.setExcludes(getExcludes());
 			// collection.setBaseDir(baseBundlesFolder);
 
-			BaseClassReporter helper = createClassReporter(CompilerVersion.get(baseVersion), compatible, classesLimit,
-					false);
-
-			if (sourcePath.isFile()) {
-				FileExts fileExts = FileExts.get(sourcePath);
-				if (fileExts != null) {
-					switch (fileExts) {
-					case CLASS:
-						result = helper.processClass(sourcePath);
-						break;
-					case JAR:
-						result = helper.processJar(sourcePath);
-						break;
-					case ZIP:
-						File workDir = getTempWorkDir();
-						ZipFileUtil.unzip(sourcePath, workDir);
-						result = helper.processFolder(workDir);
-						break;
-					case TAR:
-					case TAR_GZ:
-						// TODO
-						break;
-					case WAR:
-						// TODO
-						break;
-					default:
-						throw new IOException("Don't support this file type:" + sourcePath);
-					}
-				}
-
-			} else if (sourcePath.isDirectory()) {
-				result = helper.processFolder(sourcePath);
-			}
+			result = retrieveResult();
 
 			finishStep();
 		} catch (Exception e) {
@@ -238,6 +221,7 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 				}
 			}
 		}
-
 	}
+
+	protected abstract JSONArray retrieveResult() throws IOException;
 }

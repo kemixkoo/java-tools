@@ -4,11 +4,13 @@
 package xyz.kemix.maven.plugin.java.compiler;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.json.JSONArray;
 
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.eclipse.EclipsePluginsManager;
@@ -45,6 +47,13 @@ public class EclipsePluginsCompilerReportMojo extends BaseJavaCompilerReportMojo
 					"The source path must be the parent of plugins folder, so it's invalid path :" + getSourcePath());
 		}
 
+	}
+
+	@Override
+	protected JSONArray retrieveResult() throws IOException {
+		EclipsePluginsClassReporter reporter = new EclipsePluginsClassReporter(getBaseVersion(), isCompatible(),
+				getClassesLimit(), needInner());
+		return reporter.processFolder(getSourcePath());
 	}
 
 }
