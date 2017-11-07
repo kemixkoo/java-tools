@@ -16,7 +16,6 @@ import org.json.JSONArray;
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
 import xyz.kemix.maven.plugin.core.AbstractBaseMojo;
-import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -24,6 +23,7 @@ import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
  *         Created at 2017-10-27
  *
  */
+@SuppressWarnings("unused")
 public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 
 	private static final String[] DEFAULT_EXCLUDES = new String[] { "**/package.html" };
@@ -152,9 +152,6 @@ public abstract class BaseJavaCompilerReportMojo extends AbstractBaseMojo {
 					FilenameUtils.getBaseName(sourcePath.getName() + FileExts.JSON.ext()));
 		}
 	}
-
-	protected abstract BaseClassReporter createClassReporter(CompilerVersion baseJDKVersion,
-			boolean compatibleJDKVersion, int maxClasses, boolean innerJar);
 
 	@Override
 	protected void doExecute() throws MojoExecutionException, MojoFailureException {

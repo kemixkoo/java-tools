@@ -52,6 +52,9 @@ public class GeneralClassReporter extends BaseClassReporter {
 		Map<String, JSONObject> pathMap = new LinkedHashMap<>();
 
 		for (File classFile : classesFiles) {
+			if (isLimit()) {
+				break;
+			}
 			JSONObject detailsJson = new JSONObject();
 			if (classFile == null) {
 				throw new IOException("Must provide the class file");
@@ -125,6 +128,9 @@ public class GeneralClassReporter extends BaseClassReporter {
 		JSONSortedArray result = new JSONSortedArray();
 		Arrays.sort(jarFiles);
 		for (File jar : jarFiles) {
+			if (isLimit()) {
+				break;
+			}
 			if (jar == null) {
 				throw new IOException("Must provide the jar file");
 			}

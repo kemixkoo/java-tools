@@ -4,6 +4,7 @@
 package xyz.kemix.maven.plugin.java.compiler.reporter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,8 +60,22 @@ public class EclipsePluginsClassReporter extends BaseClassReporter {
 	 * Only support zip file or folder with sub-folders "plugins", so only need deal
 	 * with folder way.
 	 */
-	public JSONArray processFolder(File folder) throws IOException {
-		Collection<File> pluginsFiles = pluginsManager.listPluginsFilesFromProduct(folder);
+	public JSONArray processProduct(File root) throws IOException {
+		if (root == null) {
+			throw new IOException("Must provide the folder");
+		}
+		if (!root.exists()) {
+			throw new FileNotFoundException(root.getAbsolutePath());
+		}
+		if (!root.isDirectory()) {
+			throw new IOException("Must be folder: " + root.getAbsolutePath());
+		}
+		File pluginFolder = new File(root, EclipsePluginsManager.FOLDER_PLUGINS);
+		if (!pluginFolder.exists()) {
+			throw new IOException("Invalid product: " + root.getAbsolutePath());
+		}
+
+		Collection<File> pluginsFiles = pluginsManager.listPluginsFilesFromProduct(root);
 
 		File[] listFiles = FileUtils.convertFileCollectionToFileArray(pluginsFiles);
 		Arrays.sort(listFiles);
@@ -70,9 +85,9 @@ public class EclipsePluginsClassReporter extends BaseClassReporter {
 			try {
 				JSONObject bundleJson = null;
 				if (file.isFile() && file.getName().endsWith(FileExts.JAR.ext())) {
-					bundleJson = processJarBundle(folder, file);
+					bundleJson = processJarBundle(root, file);
 				} else if (file.isDirectory()) {
-					bundleJson = processFolderBundle(folder, file);
+					bundleJson = processFolderBundle(root, file);
 				}
 				if (bundleJson != null && bundleJson.length() > 0) {
 					bundlesArrays.put(bundleJson);

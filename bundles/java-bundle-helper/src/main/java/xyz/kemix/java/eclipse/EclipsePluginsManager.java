@@ -4,8 +4,10 @@
 package xyz.kemix.java.eclipse;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -21,8 +23,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.AbstractFileFilter;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -64,17 +64,15 @@ public class EclipsePluginsManager extends BundlesManager {
 			results.addAll(jarFiles);
 
 		// folders
-		Collection folderBundles = FileUtils.listFiles(pluginsFolder, FalseFileFilter.INSTANCE,
-				new AbstractFileFilter() {
+		File[] folderBundles = pluginsFolder.listFiles(new FileFilter() {
 
-					@Override
-					public boolean accept(File file) {
-						return new File(file, JarFile.MANIFEST_NAME).exists();
-					}
-
-				});
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() && new File(f, JarFile.MANIFEST_NAME).exists();
+			}
+		});
 		if (folderBundles != null) {
-			results.addAll(folderBundles);
+			results.addAll(Arrays.asList(folderBundles));
 		}
 		return results;
 	}

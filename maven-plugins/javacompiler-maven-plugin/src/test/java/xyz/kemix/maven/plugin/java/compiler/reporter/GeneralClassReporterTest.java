@@ -21,8 +21,7 @@ import org.junit.Test;
 
 import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
-import xyz.kemix.java.io.ZipFileUtil;
-import xyz.kemix.maven.plugin.java.compiler.AbstractTester;
+import xyz.kemix.maven.plugin.java.compiler.AbstractJavaCompilerTester;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -30,7 +29,7 @@ import xyz.kemix.maven.plugin.java.compiler.AbstractTester;
  *         Created at 2017-10-31
  *
  */
-public class GeneralClassReporterTest extends AbstractTester {
+public class GeneralClassReporterTest extends AbstractJavaCompilerTester {
 	class GeneralClassReporterTestClass extends GeneralClassReporter {
 
 		public GeneralClassReporterTestClass(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion) {
@@ -46,11 +45,7 @@ public class GeneralClassReporterTest extends AbstractTester {
 	@Before
 	public void setup() throws IOException {
 		super.setup();
-		URL testFileURL = this.getClass().getResource("/files/test_files.zip");
-		assertNotNull(testFileURL);
-		File testFile = new File(testFileURL.getFile());
-		assertTrue(testFile.exists());
-		ZipFileUtil.unzip(testFile, tempDir);
+		prepareTestFiles();
 	}
 
 	@Test
@@ -137,19 +132,108 @@ public class GeneralClassReporterTest extends AbstractTester {
 		JSONObject line = result.getJSONObject(0);
 		assertEquals(2, line.length());
 
-		// 1.8
 		assertEquals("test", line.getString(ResultKeys.KEY_FILE_PATH));
-
-		JSONArray list18 = line.getJSONObject(ResultKeys.KEY_DETAILS).getJSONObject(CompilerVersion.JAVA_1_8.toString())
+		final JSONObject detailsJson = line.getJSONObject(ResultKeys.KEY_DETAILS);
+		// 1.8
+		JSONArray list18 = detailsJson.getJSONObject(CompilerVersion.JAVA_1_8.toString())
 				.getJSONArray(ResultKeys.KEY_CLASSES);
 		assertEquals(1, list18.length());
 		assertEquals("Compiler18", list18.getString(0));
 
-		// 1.9
-		JSONArray list9 = line.getJSONObject(ResultKeys.KEY_DETAILS).getJSONObject(CompilerVersion.JAVA_9.toString())
+		// 9
+		JSONArray list9 = detailsJson.getJSONObject(CompilerVersion.JAVA_9.toString())
 				.getJSONArray(ResultKeys.KEY_CLASSES);
 		assertEquals(1, list9.length());
 		assertEquals("Compiler9", list9.getString(0));
+	}
+
+	@Test
+	public void test_processClasses_noBaseFile_incompatible() throws IOException {
+		File jdkTestJar = new File(tempDir, "bundle1/xyz/kemix/test/");
+		assertTrue(jdkTestJar.exists());
+
+		File[] classes = jdkTestJar.listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				return FileExts.CLASS.of(f);
+			}
+		});
+
+		GeneralClassReporter reporter = new GeneralClassReporterTestClass(CompilerVersion.JAVA_1_7, false);
+		JSONArray result = reporter.processClasses(classes);
+
+		/*
+		 * [{"FilePath":"test","Details":{"Java 1.8":{"Sum":1,"Classes":["Compiler18"]}
+		 * ,"Java 1.6":{"Sum":1,"Classes":["Compiler16"]},"Java 9":{"Sum":1,"Classes":[
+		 * "Compiler9"]}}}]
+		 */
+		assertNotNull(result);
+
+		JSONObject line = result.getJSONObject(0);
+		assertEquals(2, line.length());
+
+		assertEquals("test", line.getString(ResultKeys.KEY_FILE_PATH));
+		final JSONObject detailsJson = line.getJSONObject(ResultKeys.KEY_DETAILS);
+		// 1.8
+		JSONArray list18 = detailsJson.getJSONObject(CompilerVersion.JAVA_1_8.toString())
+				.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, list18.length());
+		assertEquals("Compiler18", list18.getString(0));
+
+		// 1.6
+		JSONArray list16 = detailsJson.getJSONObject(CompilerVersion.JAVA_1_6.toString())
+				.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, list16.length());
+		assertEquals("Compiler16", list16.getString(0));
+
+		// 9
+		JSONArray list9 = detailsJson.getJSONObject(CompilerVersion.JAVA_9.toString())
+				.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, list9.length());
+		assertEquals("Compiler9", list9.getString(0));
+	}
+
+	@Test
+	public void test_processClasses_noBaseFile_incompatible_maxClasses2() throws IOException {
+		File jdkTestJar = new File(tempDir, "bundle1/xyz/kemix/test/");
+		assertTrue(jdkTestJar.exists());
+
+		File[] classes = jdkTestJar.listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				return FileExts.CLASS.of(f);
+			}
+		});
+
+		GeneralClassReporter reporter = new GeneralClassReporter(CompilerVersion.JAVA_1_7, false, 2, withInnerJar());
+		JSONArray result = reporter.processClasses(classes);
+
+		/*
+		 * [{"FilePath":"test","Details":{"Java 1.8":{"Sum":1,"Classes":["Compiler18"]}
+		 * ,"Java 1.6":{"Sum":1,"Classes":["Compiler16"]}}}]
+		 */
+		assertNotNull(result);
+		assertEquals(1, result.length());
+
+		JSONObject line = result.getJSONObject(0);
+		assertEquals(2, line.length());
+
+		assertEquals("test", line.getString(ResultKeys.KEY_FILE_PATH));
+		final JSONObject detailsJson = line.getJSONObject(ResultKeys.KEY_DETAILS);
+		// 1.8
+		JSONArray list18 = detailsJson.getJSONObject(CompilerVersion.JAVA_1_8.toString())
+				.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, list18.length());
+		assertEquals("Compiler18", list18.getString(0));
+
+		// 1.6
+		JSONArray list16 = detailsJson.getJSONObject(CompilerVersion.JAVA_1_6.toString())
+				.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, list16.length());
+		assertEquals("Compiler16", list16.getString(0));
+
 	}
 
 	@Test
@@ -806,8 +890,7 @@ public class GeneralClassReporterTest extends AbstractTester {
 		assertTrue(list9.contains("lib/myjarlib.jar!xyz/kemix/test/Compiler9"));
 	}
 
-	@Test
-	public void test_processFolder_bundleJarsAndClasses_SameFolder() throws IOException {
+	private File prepare_processFolder_bundleJarsAndClasses_SameFolder() throws IOException {
 		File bundleFolder = new File(tempDir, "bundle1");
 		File bundleLibFolder = new File(bundleFolder, "lib");
 		File libFolder = new File(tempDir, "lib/myjarlib.jar");
@@ -825,6 +908,13 @@ public class GeneralClassReporterTest extends AbstractTester {
 		assertTrue(innerJarFile.exists());
 		FileUtils.copyFileToDirectory(innerJarFile, workingFolder);
 
+		return workingFolder;
+	}
+
+	@Test
+	public void test_processFolder_bundleJarsAndClasses_SameFolder() throws IOException {
+		final File workingFolder = prepare_processFolder_bundleJarsAndClasses_SameFolder();
+
 		GeneralClassReporter reporter = new GeneralClassReporterTestClass(CompilerVersion.JAVA_1_7, true);
 		JSONArray result = reporter.processFolder(workingFolder);
 
@@ -840,6 +930,98 @@ public class GeneralClassReporterTest extends AbstractTester {
 		 * 9":{"Sum":1,"Classes":["xyz/kemix/test/Compiler9"]}}}]
 		 */
 		doTest_processFolder_bundleJarsAndClasses(result, "");
+	}
+
+	@Test
+	public void test_processFolder_bundleJarsAndClasses_SameFolder_maxClasses8() throws IOException {
+		final File workingFolder = prepare_processFolder_bundleJarsAndClasses_SameFolder();
+
+		GeneralClassReporter reporter = new GeneralClassReporter(CompilerVersion.JAVA_1_7, true, 8, withInnerJar());
+		JSONArray result = reporter.processFolder(workingFolder);
+
+		/**
+		 * [{"BundleName":"xyz.kemix.bundle1","BundleVersion":"0.0.1","FilePath":"bundle1","Details":{"Java
+		 * 1.8":{"Sum":2,"Classes":["xyz/kemix/test/Compiler18","xyz/kemix/test/p/after/Compiler18"]},"Java
+		 * 9":{"Sum":1,"Classes":["xyz/kemix/test/Compiler9"]}}},
+		 * {"BundleName":"xyz.kemix.inner.jar","BundleVersion":"1.0.1","FilePath":"inner-jar.jar","Details":{"Java
+		 * 1.8":{"Sum":2,"Classes":["xyz/kemix/test/clazz/Compiler18","xyz/kemix/test/p8/Compiler18"]},"Java
+		 * 9":{"Sum":1,"Classes":["xyz/kemix/test/Compiler9"]}}},
+		 * {"BundleName":"xyz.kemix.myjar","BundleVersion":"1.0.0","FilePath":"myjar.jar","Details":{"Java
+		 * 1.8":{"Sum":1,"Classes":["xyz/kemix/test/p8/Compiler18"]},"Java
+		 * 9":{"Sum":1,"Classes":["xyz/kemix/test/Compiler9"]}}}]
+		 */
+
+		assertNotNull(result);
+		assertEquals(3, result.length());
+
+		// bundle folder
+		final JSONObject bundleFolderLine = result.getJSONObject(0);
+		assertEquals("xyz.kemix.bundle1", bundleFolderLine.getString(ResultKeys.KEY_BUNDLE_NAME));
+		assertEquals("0.0.1", bundleFolderLine.getString(ResultKeys.KEY_BUNDLE_VERSION));
+		assertEquals("bundle1", bundleFolderLine.getString(ResultKeys.KEY_FILE_PATH));
+		final JSONObject bundleFolderDetails = bundleFolderLine.getJSONObject(ResultKeys.KEY_DETAILS);
+
+		// 1.8
+		JSONObject obj18 = bundleFolderDetails.getJSONObject(CompilerVersion.JAVA_1_8.toString());
+		assertEquals(2, obj18.getInt(ResultKeys.KEY_CLASSES_SUM));
+		JSONArray arr18 = obj18.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(2, arr18.length());
+		List<Object> list18 = arr18.toList();
+		assertTrue(list18.contains("xyz/kemix/test/Compiler18"));
+		assertTrue(list18.contains("xyz/kemix/test/p/after/Compiler18"));
+
+		// 9
+		JSONObject obj9 = bundleFolderDetails.getJSONObject(CompilerVersion.JAVA_9.toString());
+		assertEquals(1, obj9.getInt(ResultKeys.KEY_CLASSES_SUM));
+		JSONArray arr9 = obj9.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, arr9.length());
+		final List<Object> list9 = arr9.toList();
+		assertTrue(list9.contains("xyz/kemix/test/Compiler9"));
+
+		// inner jar
+		final JSONObject innerJarLine = result.getJSONObject(1);
+		assertEquals("xyz.kemix.inner.jar", innerJarLine.getString(ResultKeys.KEY_BUNDLE_NAME));
+		assertEquals("1.0.1", innerJarLine.getString(ResultKeys.KEY_BUNDLE_VERSION));
+		assertEquals("inner-jar.jar", innerJarLine.getString(ResultKeys.KEY_FILE_PATH));
+		final JSONObject innerJarDetails = innerJarLine.getJSONObject(ResultKeys.KEY_DETAILS);
+
+		// 1.8
+		obj18 = innerJarDetails.getJSONObject(CompilerVersion.JAVA_1_8.toString());
+		assertEquals(2, obj18.getInt(ResultKeys.KEY_CLASSES_SUM));
+		arr18 = obj18.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(2, arr18.length());
+		list18 = arr18.toList();
+		assertTrue(list18.contains("xyz/kemix/test/clazz/Compiler18"));
+		assertTrue(list18.contains("xyz/kemix/test/p8/Compiler18"));
+
+		// 9
+		obj9 = innerJarDetails.getJSONObject(CompilerVersion.JAVA_9.toString());
+		assertEquals(1, obj9.getInt(ResultKeys.KEY_CLASSES_SUM));
+		arr9 = obj9.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, arr9.length());
+		assertTrue(arr9.toList().contains("xyz/kemix/test/Compiler9"));
+
+		// my jar
+		final JSONObject myJarLine = result.getJSONObject(2);
+		assertEquals("xyz.kemix.myjar", myJarLine.getString(ResultKeys.KEY_BUNDLE_NAME));
+		assertEquals("1.0.0", myJarLine.getString(ResultKeys.KEY_BUNDLE_VERSION));
+		assertEquals("myjar.jar", myJarLine.getString(ResultKeys.KEY_FILE_PATH));
+		final JSONObject myJarDetails = myJarLine.getJSONObject(ResultKeys.KEY_DETAILS);
+
+		// 1.8
+		obj18 = myJarDetails.getJSONObject(CompilerVersion.JAVA_1_8.toString());
+		assertEquals(1, obj18.getInt(ResultKeys.KEY_CLASSES_SUM));
+		arr18 = obj18.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, arr18.length());
+		assertTrue(arr18.toList().contains("xyz/kemix/test/p8/Compiler18"));
+
+		// 9
+		obj9 = myJarDetails.getJSONObject(CompilerVersion.JAVA_9.toString());
+		assertEquals(1, obj9.getInt(ResultKeys.KEY_CLASSES_SUM));
+		arr9 = obj9.getJSONArray(ResultKeys.KEY_CLASSES);
+		assertEquals(1, arr9.length());
+		assertTrue(arr9.toList().contains("xyz/kemix/test/Compiler9"));
+
 	}
 
 	private void doTest_processFolder_bundleJarsAndClasses(JSONArray result, String path) {

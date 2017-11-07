@@ -12,10 +12,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.json.JSONArray;
 
-import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.eclipse.EclipsePluginsManager;
 import xyz.kemix.java.io.FileExts;
-import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
 import xyz.kemix.maven.plugin.java.compiler.reporter.EclipsePluginsClassReporter;
 
 /**
@@ -26,12 +24,6 @@ import xyz.kemix.maven.plugin.java.compiler.reporter.EclipsePluginsClassReporter
  */
 @Mojo(name = "plugins-report", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class EclipsePluginsCompilerReportMojo extends BaseJavaCompilerReportMojo {
-
-	@Override
-	protected BaseClassReporter createClassReporter(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion,
-			int maxClasses, boolean innerJar) {
-		return new EclipsePluginsClassReporter(baseJDKVersion, compatibleJDKVersion, maxClasses, innerJar);
-	}
 
 	@Override
 	protected void validateParameters() throws MojoExecutionException, MojoFailureException {
@@ -53,7 +45,7 @@ public class EclipsePluginsCompilerReportMojo extends BaseJavaCompilerReportMojo
 	protected JSONArray retrieveResult() throws IOException {
 		EclipsePluginsClassReporter reporter = new EclipsePluginsClassReporter(getBaseVersion(), isCompatible(),
 				getClassesLimit(), needInner());
-		return reporter.processFolder(getSourcePath());
+		return reporter.processProduct(getSourcePath());
 	}
 
 }

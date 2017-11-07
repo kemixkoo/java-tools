@@ -45,7 +45,7 @@ public class BaseClassReporter implements ResultKeys {
 	protected final int maxClasses;
 	protected final boolean innerJar;
 
-	private int number;
+	private int number = 1;
 
 	BaseClassReporter(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion, int maxClasses, boolean innerJar) {
 		super();
@@ -55,7 +55,7 @@ public class BaseClassReporter implements ResultKeys {
 		this.innerJar = innerJar;
 	}
 
-	private boolean isLimit() {
+	boolean isLimit() {
 		if (maxClasses < 1) { // if <=0, no limit
 			return false;
 		}
@@ -138,7 +138,6 @@ public class BaseClassReporter implements ResultKeys {
 						if (isLimit()) {
 							break;
 						}
-						number++;
 
 						final InputStream classStream = jarFile.getInputStream(entry);
 
@@ -208,8 +207,6 @@ public class BaseClassReporter implements ResultKeys {
 			if (isLimit()) {
 				break;
 			}
-			number++;
-
 			processClass(detailsJson, bundleFile, classFile);
 		}
 
@@ -265,6 +262,9 @@ public class BaseClassReporter implements ResultKeys {
 	}
 
 	void processClass(JSONObject detailsJson, File baseFile, File classFile) throws IOException {
+		if (isLimit()) {
+			return;
+		}
 		String message = null;
 		if (baseFile != null) { // relate to bundle
 			message = "Can't process the class file:" + classFile.getName() + " for bundle:" + baseFile.getName();
@@ -279,6 +279,9 @@ public class BaseClassReporter implements ResultKeys {
 
 	void processClass(JSONObject detailsJson, InputStream classStream, String classPath, String exceptionMessge)
 			throws IOException {
+		if (isLimit()) {
+			return;
+		}
 		try {
 			CompilerVersion cv = getInvalidCompilerVersion(classStream);
 			if (cv != null) {
@@ -296,6 +299,7 @@ public class BaseClassReporter implements ResultKeys {
 				JSONArray classesArrays = cvJson.getJSONArray(KEY_CLASSES);
 
 				classesArrays.put(classPath);
+				number++;
 			}
 		} catch (IOException e) {
 			throw new IOException(exceptionMessge, e);

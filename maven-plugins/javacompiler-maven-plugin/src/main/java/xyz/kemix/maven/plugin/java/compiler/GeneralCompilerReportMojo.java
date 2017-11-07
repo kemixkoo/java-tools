@@ -10,10 +10,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.json.JSONArray;
 
-import xyz.kemix.java.CompilerVersion;
 import xyz.kemix.java.io.FileExts;
 import xyz.kemix.java.io.ZipFileUtil;
-import xyz.kemix.maven.plugin.java.compiler.reporter.BaseClassReporter;
 import xyz.kemix.maven.plugin.java.compiler.reporter.GeneralClassReporter;
 
 /**
@@ -24,12 +22,6 @@ import xyz.kemix.maven.plugin.java.compiler.reporter.GeneralClassReporter;
  */
 @Mojo(name = "report", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class GeneralCompilerReportMojo extends BaseJavaCompilerReportMojo {
-
-	@Override
-	protected BaseClassReporter createClassReporter(CompilerVersion baseJDKVersion, boolean compatibleJDKVersion,
-			int maxClasses, boolean innerJar) {
-		return new GeneralClassReporter(baseJDKVersion, compatibleJDKVersion, maxClasses, innerJar);
-	}
 
 	@Override
 	protected JSONArray retrieveResult() throws IOException {
