@@ -14,6 +14,7 @@ import org.json.JSONArray;
 
 import xyz.kemix.java.eclipse.EclipsePluginsManager;
 import xyz.kemix.java.io.FileExts;
+import xyz.kemix.java.io.ZipFileUtil;
 import xyz.kemix.maven.plugin.java.compiler.reporter.EclipsePluginsClassReporter;
 
 /**
@@ -21,6 +22,7 @@ import xyz.kemix.maven.plugin.java.compiler.reporter.EclipsePluginsClassReporter
  *
  *         Created at 2017-10-28
  *
+ *         enable to process the folder or zip of eclipse product.
  */
 @Mojo(name = "plugins-report", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class EclipsePluginsCompilerReportMojo extends BaseJavaCompilerReportMojo {
@@ -41,11 +43,31 @@ public class EclipsePluginsCompilerReportMojo extends BaseJavaCompilerReportMojo
 
 	}
 
+	boolean isZip() {
+		return getSourcePath() != null && getSourcePath().isFile() && FileExts.ZIP.of(getSourcePath());
+	}
+
+	@Override
+	protected void beforeExecute() throws MojoExecutionException, MojoFailureException {
+		super.beforeExecute();
+		if (isZip()) {
+			try {
+				ZipFileUtil.unzip(getSourcePath(), getTempWorkDir());
+			} catch (IOException e) {
+				throw new MojoExecutionException("Prepare the zip file failure: " + getSourcePath(), e);
+			}
+		}
+	}
+
 	@Override
 	protected JSONArray retrieveResult() throws IOException {
 		EclipsePluginsClassReporter reporter = new EclipsePluginsClassReporter(getBaseVersion(), isCompatible(),
 				getClassesLimit(), needInner());
-		return reporter.processProduct(getSourcePath());
+		File workingFolder = getTempWorkDir();
+		if (!isZip()) {
+			workingFolder = getSourcePath();
+		}
+		return reporter.processProduct(workingFolder);
 	}
 
 }

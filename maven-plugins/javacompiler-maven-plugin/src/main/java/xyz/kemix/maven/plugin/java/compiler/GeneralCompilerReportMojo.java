@@ -19,6 +19,8 @@ import xyz.kemix.maven.plugin.java.compiler.reporter.GeneralClassReporter;
  *
  *         Created at 2017-10-28
  *
+ *         enable to process the class/jar files directly, the folder of classes
+ *         and jars, the zip file.
  */
 @Mojo(name = "report", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class GeneralCompilerReportMojo extends BaseJavaCompilerReportMojo {
