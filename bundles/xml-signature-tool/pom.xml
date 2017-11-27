@@ -2,14 +2,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>xyz.kemix.maven.plugins</groupId>
-		<artifactId>maven-plugins-parent</artifactId>
+		<groupId>xyz.kemix.java.bundles</groupId>
+		<artifactId>java-bundles-parent</artifactId>
 		<version>1.0.0</version>
-		<relativePath>../</relativePath>
 	</parent>
-	<artifactId>maven-plugin-core</artifactId>
+	<artifactId>xml-signature-tool</artifactId>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
