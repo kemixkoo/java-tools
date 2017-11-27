@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import org.apache.commons.io.IOUtils;
@@ -118,8 +120,6 @@ public abstract class KeyPairGen {
         }
     }
 
-    protected abstract EncodedKeySpec getPrivateKeySpec(byte[] values);
-
     public PublicKey loadPublicKey(File pubFile) throws IOException, GeneralSecurityException {
 
         FileReader fr = null;
@@ -137,5 +137,11 @@ public abstract class KeyPairGen {
         }
     }
 
-    protected abstract EncodedKeySpec getPublicKeySpec(byte[] values);
+    protected EncodedKeySpec getPrivateKeySpec(byte[] values) {
+        return new PKCS8EncodedKeySpec(values);
+    }
+
+    protected EncodedKeySpec getPublicKeySpec(byte[] values) {
+        return new X509EncodedKeySpec(values);
+    };
 }

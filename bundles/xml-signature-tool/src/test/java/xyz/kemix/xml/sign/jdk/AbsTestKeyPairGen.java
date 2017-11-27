@@ -37,13 +37,7 @@ public abstract class AbsTestKeyPairGen {
 
     protected void doTest(int keySize) throws IOException, GeneralSecurityException {
         KeyPairGen gen = createKeyPairGen(keySize);
-        KeyPair keyPair = null;
-        try {
-            keyPair = gen.generateKey();
-        } catch (java.security.InvalidParameterException e) {
-            e.printStackTrace();
-            return;
-        }
+        KeyPair keyPair = gen.generateKey();
 
         File priFile = new File(tempDir, DSAKeyPairGen.FILE_PRIVATE_KEY);
         File pubFile = new File(tempDir, DSAKeyPairGen.FILE_PUBLIC_KEY);

@@ -2,9 +2,6 @@ package xyz.kemix.xml.sign.jdk;
 
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -15,7 +12,7 @@ import java.security.spec.X509EncodedKeySpec;
  * 
  * java.security.interfaces.DSAPrivateKey: sun.security.provider.DSAPrivateKey
  * 
- * Recommend the keySize to be set 512, 768, 1024, 2048.
+ * Recommend the keySize to be set 512, 768, 1024, 2048, don't support others
  */
 public class DSAKeyPairGen extends KeyPairGen {
 
@@ -31,13 +28,4 @@ public class DSAKeyPairGen extends KeyPairGen {
         return keyPair;
     }
 
-    @Override
-    protected EncodedKeySpec getPrivateKeySpec(byte[] values) {
-        return new PKCS8EncodedKeySpec(values);
-    }
-
-    @Override
-    protected EncodedKeySpec getPublicKeySpec(byte[] values) {
-        return new X509EncodedKeySpec(values);
-    }
 }
