@@ -1,4 +1,4 @@
-package xyz.kemix.xml.sign.jdk;
+package xyz.kemix.xml.sign.jdk.key;
 
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;

@@ -1,4 +1,4 @@
-package xyz.kemix.xml.sign.jdk;
+package xyz.kemix.xml.sign.jdk.key;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+
+import xyz.kemix.xml.sign.jdk.key.DSAKeyPairGen;
+import xyz.kemix.xml.sign.jdk.key.KeyPairGen;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
