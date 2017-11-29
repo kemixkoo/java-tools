@@ -20,6 +20,8 @@ import java.util.Base64;
 
 import org.apache.commons.io.IOUtils;
 
+import xyz.kemix.xml.sign.Base64Util;
+
 /**
  * @author Kemix Koo <kemix_koo@163.com>
  *
@@ -109,7 +111,7 @@ public abstract class KeyPairGen {
         try {
             fr = new FileReader(priFile);
             final String encoded = IOUtils.toString(fr);
-            byte[] values = Base64.getMimeDecoder().decode(encoded);
+            byte[] values = Base64Util.decode(encoded);
 
             final KeyFactory keyFactory = KeyFactory.getInstance(getAlgorithm());
             return keyFactory.generatePrivate(getPrivateKeySpec(values));
@@ -126,7 +128,7 @@ public abstract class KeyPairGen {
         try {
             fr = new FileReader(pubFile);
             final String encoded = IOUtils.toString(fr);
-            byte[] values = Base64.getMimeDecoder().decode(encoded);
+            byte[] values = Base64Util.decode(encoded);
 
             final KeyFactory keyFactory = KeyFactory.getInstance(getAlgorithm());
             return keyFactory.generatePublic(getPublicKeySpec(values));
