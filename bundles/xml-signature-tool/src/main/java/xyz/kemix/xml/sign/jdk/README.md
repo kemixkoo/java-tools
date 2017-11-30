@@ -21,9 +21,11 @@ After sign the "Data", will add the "Signature" node outside of "Data", means "E
 <?xml version="1.0" encoding="UTF-8"?>
 <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
 	..............
-	<Data>
-		..............
-	</Data>
+	<Object>
+		<Data>
+			..............
+		</Data>
+	</Object>
 </Signature>
 ```
 

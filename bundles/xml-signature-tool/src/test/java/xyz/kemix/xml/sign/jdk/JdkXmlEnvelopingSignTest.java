@@ -13,21 +13,21 @@ import org.w3c.dom.Document;
  * Created at 2017-11-29
  *
  */
-public class JdkXmlEnvelopedSignTest extends AbsTestJdkXmlSign {
+public class JdkXmlEnvelopingSignTest extends AbsTestJdkXmlSign {
 
     @Override
     AbsJdkXmlSign createJdkXmlSign() {
-        return new JdkXmlEnvelopedSign();
+        return new JdkXmlEnvelopingSign();
     }
 
     @Override
     String getTestName() {
-        return "enveloped";
+        return "enveloping";
     }
 
     @Test
     public void test_valid() throws Exception {
-        Document doc = loadDoc("/jdk/demo-enveloped.xml");
+        Document doc = loadDoc("/jdk/demo-enveloping.xml");
         assertNotNull(doc);
 
         AbsJdkXmlSign sign = createJdkXmlSign();
@@ -37,7 +37,7 @@ public class JdkXmlEnvelopedSignTest extends AbsTestJdkXmlSign {
 
     @Test
     public void test_valid_format() throws Exception {
-        Document doc = loadDoc("/jdk/demo-enveloped-format.xml");
+        Document doc = loadDoc("/jdk/demo-enveloping-format.xml");
         assertNotNull(doc);
 
         AbsJdkXmlSign sign = createJdkXmlSign();
