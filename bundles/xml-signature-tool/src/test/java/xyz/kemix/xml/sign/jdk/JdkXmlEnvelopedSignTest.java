@@ -2,7 +2,6 @@ package xyz.kemix.xml.sign.jdk;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -26,23 +25,12 @@ public class JdkXmlEnvelopedSignTest extends AbsTestJdkXmlSign {
     }
 
     @Test
-    public void test_valid() throws Exception {
-        Document doc = loadDoc("/jdk/demo-enveloped.xml");
-        assertNotNull(doc);
-
-        AbsJdkXmlSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
-        assertTrue("Valid failure", valid);
-    }
-
-    @Test
     public void test_valid_format() throws Exception {
-        Document doc = loadDoc("/jdk/demo-enveloped-format.xml");
+        Document doc = loadDoc("/jdk/demo-" + getTestName() + "-format.xml");
         assertNotNull(doc);
 
         AbsJdkXmlSign sign = createJdkXmlSign();
         boolean valid = sign.valid(doc);
         assertFalse("After format the Data, won't be valid yet", valid);
     }
-
 }

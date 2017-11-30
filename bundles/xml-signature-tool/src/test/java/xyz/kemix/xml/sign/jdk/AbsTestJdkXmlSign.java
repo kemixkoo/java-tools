@@ -60,6 +60,16 @@ public abstract class AbsTestJdkXmlSign {
     abstract String getTestName();
 
     @Test
+    public void test_valid() throws Exception {
+        Document doc = loadDoc("/jdk/demo-" + getTestName() + ".xml");
+        assertNotNull(doc);
+
+        AbsJdkXmlSign sign = createJdkXmlSign();
+        boolean valid = sign.valid(doc);
+        assertTrue("Valid failure", valid);
+    }
+
+    @Test
     public void test_sign_valid_DSA_IT() throws Exception {
         KeyPair dsaKeypair = new DSAKeyPairGen(1024).generateKey();
         doTestForSignatureMethod(dsaKeypair, SignatureMethod.DSA_SHA1);

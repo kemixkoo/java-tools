@@ -113,8 +113,8 @@ public abstract class AbsJdkXmlSign {
 
         PublicKey pubKey = ((KeyValue) signature.getKeyInfo().getContent().get(0)).getPublicKey();
         // if signatureNode is in doc, ok for this also
-        // DOMValidateContext valCtx = new DOMValidateContext(publicKey, signatureNode);
-        DOMValidateContext valContext = new DOMValidateContext(pubKey, doc.getDocumentElement());
+        DOMValidateContext valContext = new DOMValidateContext(pubKey, signatureNode);
+        // DOMValidateContext valContext = new DOMValidateContext(pubKey, doc.getDocumentElement());
 
         return signature.validate(valContext);
     }
