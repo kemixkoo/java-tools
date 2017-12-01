@@ -2,7 +2,7 @@
 
 ONLY use the JDK APIs to sign xml with public/private keys. ( Support DSA and RSA)
 
-## Class JdkXmlEnvelopedSign
+## Class JdkXmlEnvelopedKeyPairSign & JdkXmlEnvelopedKeyStoreSign
 
 After sign the "Data", will add the "Signature" node inside of "Data", means "Enveloped":
 ```

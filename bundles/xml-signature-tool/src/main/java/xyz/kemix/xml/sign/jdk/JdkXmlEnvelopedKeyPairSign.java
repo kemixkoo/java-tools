@@ -1,7 +1,5 @@
 package xyz.kemix.xml.sign.jdk;
 
-import java.security.KeyPair;
-
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
@@ -19,7 +17,7 @@ import org.w3c.dom.Document;
  * <Data> .............. <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> .............. </Signature> </Data>
  */
 @SuppressWarnings("nls")
-public class JdkXmlEnvelopedSign extends AbsJdkXmlSign {
+public class JdkXmlEnvelopedKeyPairSign extends AbsJdkXmlKeyPairSign {
 
     /**
      * After sign, will add one Signature node in the end of XML doc. The sign value and public key will be stored in
@@ -27,23 +25,22 @@ public class JdkXmlEnvelopedSign extends AbsJdkXmlSign {
      * 
      */
     @Override
-    public Document sign(Document doc, KeyPair keypair) throws Exception {
+    public Document sign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 
         // 2. create KeyInfo
-        final KeyInfo keyInfo = createKeyInfo(keypair);
+        final KeyInfo keyInfo = createKeyInfo();
 
         // 3. create Signature
         final XMLSignature xmlSignature = SIGN_FACTORY.newXMLSignature(signedInfo, keyInfo);
 
         // 4. create SignContext
-        final DOMSignContext domSignCtx = new DOMSignContext(keypair.getPrivate(), doc.getDocumentElement());
+        final DOMSignContext domSignCtx = new DOMSignContext(getKeypair().getPrivate(), doc.getDocumentElement());
 
         // 5. sign
         xmlSignature.sign(domSignCtx);
 
         return doc;
     }
-
 }

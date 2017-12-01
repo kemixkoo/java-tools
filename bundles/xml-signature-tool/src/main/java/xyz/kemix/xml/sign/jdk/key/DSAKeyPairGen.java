@@ -16,8 +16,10 @@ import java.security.NoSuchAlgorithmException;
  */
 public class DSAKeyPairGen extends KeyPairGen {
 
+    public static final String TYPE = "DSA";
+
     public DSAKeyPairGen(int keySize) {
-        super("DSA", keySize);
+        super(TYPE, keySize);
     }
 
     @Override

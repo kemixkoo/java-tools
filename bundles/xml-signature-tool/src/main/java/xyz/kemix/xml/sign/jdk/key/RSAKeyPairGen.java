@@ -16,8 +16,10 @@ import java.security.NoSuchAlgorithmException;
  */
 public class RSAKeyPairGen extends KeyPairGen {
 
+    public static final String TYPE = "RSA";
+
     public RSAKeyPairGen(int keySize) {
-        super("RSA", keySize);
+        super(TYPE, keySize);
     }
 
     @Override

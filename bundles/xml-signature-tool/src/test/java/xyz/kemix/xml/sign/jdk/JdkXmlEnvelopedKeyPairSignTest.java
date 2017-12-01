@@ -12,21 +12,21 @@ import org.w3c.dom.Document;
  * Created at 2017-11-29
  *
  */
-public class JdkXmlEnvelopedSignTest extends AbsTestJdkXmlSign {
+public class JdkXmlEnvelopedKeyPairSignTest extends AbsTestJdkXmlKeyPairSign {
 
     @Override
-    AbsJdkXmlSign createJdkXmlSign() {
-        return new JdkXmlEnvelopedSign();
+    AbsJdkXmlKeyPairSign createJdkXmlSign() {
+        return new JdkXmlEnvelopedKeyPairSign();
     }
 
     @Override
     String getTestName() {
-        return "enveloped";
+        return super.getTestName() + '-' + "enveloped";
     }
 
     @Test
-    public void test_valid_format() throws Exception {
-        Document doc = loadDoc("/jdk/demo-" + getTestName() + "-format.xml");
+    public void test_valid_keyPair_format() throws Exception {
+        Document doc = loadXmlDoc("jdk/demo-" + getTestName() + "-format.xml");
         assertNotNull(doc);
 
         AbsJdkXmlSign sign = createJdkXmlSign();

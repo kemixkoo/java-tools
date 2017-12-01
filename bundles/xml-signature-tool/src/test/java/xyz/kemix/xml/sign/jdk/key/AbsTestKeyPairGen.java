@@ -5,13 +5,9 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 
-import xyz.kemix.xml.sign.jdk.key.DSAKeyPairGen;
-import xyz.kemix.xml.sign.jdk.key.KeyPairGen;
+import xyz.kemix.xml.sign.AbsTestParent;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -19,22 +15,7 @@ import xyz.kemix.xml.sign.jdk.key.KeyPairGen;
  * Created at 2017-11-27
  *
  */
-public abstract class AbsTestKeyPairGen {
-
-    protected File tempDir;
-
-    @Before
-    public void setup() throws IOException {
-        tempDir = File.createTempFile(this.getClass().getSimpleName(), "");
-        tempDir.delete();
-        tempDir.mkdirs();
-    }
-
-    @After
-    public void cleanup() throws IOException {
-        if (tempDir != null)
-            FileUtils.deleteDirectory(tempDir);
-    }
+public abstract class AbsTestKeyPairGen extends AbsTestParent {
 
     protected abstract KeyPairGen createKeyPairGen(int keySize);
 

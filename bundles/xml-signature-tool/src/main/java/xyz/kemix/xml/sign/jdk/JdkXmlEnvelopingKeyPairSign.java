@@ -1,6 +1,5 @@
 package xyz.kemix.xml.sign.jdk;
 
-import java.security.KeyPair;
 import java.util.Collections;
 
 import javax.xml.crypto.dom.DOMStructure;
@@ -23,15 +22,15 @@ import org.w3c.dom.Document;
  * <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> .............. <Data> .............. </Data> </Signature>
  */
 @SuppressWarnings("nls")
-public class JdkXmlEnvelopingSign extends AbsJdkXmlSign {
+public class JdkXmlEnvelopingKeyPairSign extends AbsJdkXmlKeyPairSign {
 
     @Override
-    public Document sign(Document doc, KeyPair keypair) throws Exception {
+    public Document sign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 
         // 2. create KeyInfo
-        final KeyInfo keyInfo = createKeyInfo(keypair);
+        final KeyInfo keyInfo = createKeyInfo();
 
         // 3. create Signature
         final DOMStructure domStructure = new DOMStructure(doc.getDocumentElement());
@@ -43,7 +42,7 @@ public class JdkXmlEnvelopingSign extends AbsJdkXmlSign {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document newDocument = dbf.newDocumentBuilder().newDocument();
-        DOMSignContext dsc = new DOMSignContext(keypair.getPrivate(), newDocument);
+        DOMSignContext dsc = new DOMSignContext(getKeypair().getPrivate(), newDocument);
 
         // 5. sign
         xmlSignature.sign(dsc);

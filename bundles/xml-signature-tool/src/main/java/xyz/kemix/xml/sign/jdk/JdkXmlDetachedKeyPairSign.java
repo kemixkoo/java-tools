@@ -1,7 +1,6 @@
 package xyz.kemix.xml.sign.jdk;
 
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -25,7 +24,7 @@ import org.w3c.dom.Document;
  * 
  * <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> .............. </Signature>
  */
-public class JdkXmlDetachedSign extends AbsJdkXmlSign {
+public class JdkXmlDetachedKeyPairSign extends AbsJdkXmlKeyPairSign {
 
     protected Reference createReference(final String docUri) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         // if null or "", for all doc
@@ -35,12 +34,12 @@ public class JdkXmlDetachedSign extends AbsJdkXmlSign {
     }
 
     @Override
-    public Document sign(Document doc, KeyPair keypair) throws Exception {
+    public Document sign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 
         // 2. create KeyInfo
-        final KeyInfo keyInfo = createKeyInfo(keypair);
+        final KeyInfo keyInfo = createKeyInfo();
 
         // 3. create Signature
         final XMLSignature xmlSignature = SIGN_FACTORY.newXMLSignature(signedInfo, keyInfo);
@@ -49,7 +48,7 @@ public class JdkXmlDetachedSign extends AbsJdkXmlSign {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document newDocument = dbf.newDocumentBuilder().newDocument();
-        DOMSignContext dsc = new DOMSignContext(keypair.getPrivate(), newDocument);
+        DOMSignContext dsc = new DOMSignContext(getKeypair().getPrivate(), newDocument);
 
         // 5. sign
         xmlSignature.sign(dsc);
