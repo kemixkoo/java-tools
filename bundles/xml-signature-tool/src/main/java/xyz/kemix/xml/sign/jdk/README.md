@@ -15,7 +15,7 @@ After sign the "Data", will add the "Signature" node inside of "Data", means "En
 </Data>
 ```
 
-## Class JdkXmlEnvelopingSign
+## Class JdkXmlEnvelopingKeyPairSign
 After sign the "Data", will add the "Signature" node outside of "Data", means "Enveloping":
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -29,7 +29,7 @@ After sign the "Data", will add the "Signature" node outside of "Data", means "E
 </Signature>
 ```
 
-## Class JdkXmlDetachedSign
+## Class JdkXmlDetachedKeyPairSign
 After sign the "Data", will add the "Signature" node same level of "Data", means "Detached":
 ```
 <?xml version="1.0" encoding="UTF-8"?>

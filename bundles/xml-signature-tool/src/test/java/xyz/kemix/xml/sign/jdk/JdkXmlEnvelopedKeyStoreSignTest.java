@@ -23,12 +23,12 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
 
     @Override
-    AbsJdkXmlKeyStoreSign createJdkXmlSign() {
+    protected AbsJdkXmlKeyStoreSign createJdkXmlSign() {
         return new JdkXmlEnvelopedKeyStoreSign();
     }
 
     @Override
-    String getTestName() {
+    protected String getTestName() {
         return super.getTestName() + '-' + "enveloped";
     }
 
@@ -42,7 +42,7 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.DSA_SHA1);
 
-        sign.setStoreType(KeyStoreUtil.JKS);
+        sign.getKeystoreSetting().setStoreType(KeyStoreUtil.JKS);
         URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + "kemix-dsa.jks");
         setStore(sign, storeUrl);
 
@@ -60,7 +60,7 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.RSA_SHA1);
 
-        sign.setStoreType(KeyStoreUtil.JKS);
+        sign.getKeystoreSetting().setStoreType(KeyStoreUtil.JKS);
         URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + "kemix-rsa.jks");
         setStore(sign, storeUrl);
 

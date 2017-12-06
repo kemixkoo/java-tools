@@ -15,12 +15,12 @@ import org.w3c.dom.Document;
 public class JdkXmlEnvelopedKeyPairSignTest extends AbsTestJdkXmlKeyPairSign {
 
     @Override
-    AbsJdkXmlKeyPairSign createJdkXmlSign() {
+    protected AbsJdkXmlKeyPairSign createJdkXmlSign() {
         return new JdkXmlEnvelopedKeyPairSign();
     }
 
     @Override
-    String getTestName() {
+    protected String getTestName() {
         return super.getTestName() + '-' + "enveloped";
     }
 

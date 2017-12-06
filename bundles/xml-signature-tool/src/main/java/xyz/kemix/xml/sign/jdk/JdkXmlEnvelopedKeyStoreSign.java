@@ -24,15 +24,15 @@ import org.w3c.dom.Document;
 public class JdkXmlEnvelopedKeyStoreSign extends AbsJdkXmlKeyStoreSign {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Document sign(Document doc) throws Exception {
+    public Document doSign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 
         // 2.create KeyInfo
-        final KeyStore ks = KeyStore.getInstance(getStoreType());
-        ks.load(getStoreUrl().openStream(), getStorePassword());
-        final KeyStore.PrivateKeyEntry keyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(getKeyAlias(),
-                new KeyStore.PasswordProtection(getKeyPassword()));
+        final KeyStore ks = KeyStore.getInstance(getKeystoreSetting().getStoreType());
+        ks.load(getKeystoreSetting().getStoreUrl().openStream(), getKeystoreSetting().getStorePassword());
+        final KeyStore.PrivateKeyEntry keyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(getKeystoreSetting().getKeyAlias(),
+                new KeyStore.PasswordProtection(getKeystoreSetting().getKeyPassword()));
         final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
         final KeyInfoFactory keyInfoFac = SIGN_FACTORY.getKeyInfoFactory();
         final X509IssuerSerial newX509IssuerSerial = keyInfoFac.newX509IssuerSerial(cert.getIssuerX500Principal().getName(),

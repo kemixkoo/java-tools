@@ -1,4 +1,4 @@
-package xyz.kemix.xml.sign.jdk;
+package xyz.kemix.xml.sign;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,13 +22,11 @@ import org.xml.sax.SAXException;
  * Created at 2017-11-29
  *
  */
-public abstract class AbsTestJdkXmlSign {
+public abstract class AbsTestXmlSign extends AbsTestParent {
 
-    static final String PATH_XML = "/xml/";
+    protected static final String PATH_XML = "/xml/";
 
-    static boolean out = false;
-
-    Document loadXmlDoc(String path) throws ParserConfigurationException, SAXException, IOException {
+    protected Document loadXmlDoc(String path) throws ParserConfigurationException, SAXException, IOException {
         InputStream stream = this.getClass().getResourceAsStream(PATH_XML + path);
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -37,16 +35,13 @@ public abstract class AbsTestJdkXmlSign {
         return db.parse(stream);
     }
 
-    void console(Document doc) throws Exception {
+    protected void console(Document doc) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.transform(new DOMSource(doc), new StreamResult(System.out));
     }
 
-    void file(Document doc, File file) throws Exception {
-        if (!out) {
-            return;
-        }
+    protected void file(Document doc, File file) throws Exception {
         file.getParentFile().mkdirs();
 
         TransformerFactory tf = TransformerFactory.newInstance();
@@ -54,8 +49,6 @@ public abstract class AbsTestJdkXmlSign {
         transformer.transform(new DOMSource(doc), new StreamResult(new FileOutputStream(file)));
     }
 
-    abstract AbsJdkXmlSign createJdkXmlSign();
-
-    abstract String getTestName();
+    protected abstract String getTestName();
 
 }

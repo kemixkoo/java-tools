@@ -25,7 +25,7 @@ public class JdkXmlEnvelopedKeyPairSign extends AbsJdkXmlKeyPairSign {
      * 
      */
     @Override
-    public Document sign(Document doc) throws Exception {
+    public Document doSign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 

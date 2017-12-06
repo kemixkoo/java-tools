@@ -9,12 +9,12 @@ package xyz.kemix.xml.sign.jdk;
 public class JdkXmlEnvelopingKeyPairSignTest extends AbsTestJdkXmlKeyPairSign {
 
     @Override
-    AbsJdkXmlKeyPairSign createJdkXmlSign() {
+    protected AbsJdkXmlKeyPairSign createJdkXmlSign() {
         return new JdkXmlEnvelopingKeyPairSign();
     }
 
     @Override
-    String getTestName() {
+    protected String getTestName() {
         return super.getTestName() + '-' + "enveloping";
     }
 }

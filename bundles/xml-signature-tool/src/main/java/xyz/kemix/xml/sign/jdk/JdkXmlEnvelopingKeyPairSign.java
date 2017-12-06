@@ -25,7 +25,12 @@ import org.w3c.dom.Document;
 public class JdkXmlEnvelopingKeyPairSign extends AbsJdkXmlKeyPairSign {
 
     @Override
-    public Document sign(Document doc) throws Exception {
+    protected void beforeSign(Document doc) {
+        // super.beforeSign(doc); //shouldn't remove the sign node
+    }
+
+    @Override
+    public Document doSign(Document doc) throws Exception {
         // 1. create SignedInfo
         final SignedInfo signedInfo = createSignedInfo("");// FIXME, for all doc
 

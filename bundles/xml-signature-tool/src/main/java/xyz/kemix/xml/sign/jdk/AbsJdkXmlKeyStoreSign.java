@@ -1,6 +1,5 @@
 package xyz.kemix.xml.sign.jdk;
 
-import java.net.URL;
 import java.security.PublicKey;
 
 import javax.xml.crypto.dom.DOMStructure;
@@ -10,6 +9,7 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import xyz.kemix.xml.sign.KeyStoreSetting;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 
 /**
@@ -20,69 +20,16 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
  */
 public abstract class AbsJdkXmlKeyStoreSign extends AbsJdkXmlSign {
 
-    /**
-     * support for JKS, PKCS12
-     * 
-     */
-    private String storeType = KeyStoreUtil.JKS;
+    private final KeyStoreSetting keystoreSetting = new KeyStoreSetting();
 
-    /**
-     * if the key type of keystore should be same as signatureMethod.
-     */
-    private URL storeUrl;
-
-    private char[] storePassword;
-
-    private String keyAlias;
-
-    private char[] keyPassword;
-
-    public String getStoreType() {
-        return storeType;
-    }
-
-    public void setStoreType(String storeType) {
-        this.storeType = storeType;
-    }
-
-    public URL getStoreUrl() {
-        return storeUrl;
-    }
-
-    public void setStoreUrl(URL storeUrl) {
-        this.storeUrl = storeUrl;
-    }
-
-    public char[] getStorePassword() {
-        return storePassword;
-    }
-
-    public void setStorePassword(char[] storePassword) {
-        this.storePassword = storePassword;
-    }
-
-    public String getKeyAlias() {
-        return keyAlias;
-    }
-
-    public void setKeyAlias(String keyAlias) {
-        this.keyAlias = keyAlias;
-    }
-
-    public char[] getKeyPassword() {
-        if (keyPassword == null) { // if not set, use same password of store
-            return storePassword;
-        }
-        return keyPassword;
-    }
-
-    public void setKeyPassword(char[] keyPassword) {
-        this.keyPassword = keyPassword;
+    public KeyStoreSetting getKeystoreSetting() {
+        return keystoreSetting;
     }
 
     @Override
     public boolean valid(Document doc) throws Exception {
-        final PublicKey publicKey = KeyStoreUtil.getPublicKey(getStoreUrl(), getStoreType(), getStorePassword(), getKeyAlias());
+        final PublicKey publicKey = KeyStoreUtil.getPublicKey(getKeystoreSetting().getStoreUrl(), getKeystoreSetting()
+                .getStoreType(), getKeystoreSetting().getStorePassword(), getKeystoreSetting().getKeyAlias());
 
         // find signature node
         final Node signatureNode = getSignatureNode(doc);

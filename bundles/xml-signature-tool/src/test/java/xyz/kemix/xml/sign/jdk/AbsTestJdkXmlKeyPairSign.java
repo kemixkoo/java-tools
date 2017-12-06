@@ -12,6 +12,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import xyz.kemix.xml.sign.AbsTestXmlSign;
 import xyz.kemix.xml.sign.jdk.key.DSAKeyPairGen;
 import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
 
@@ -21,10 +22,12 @@ import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestJdkXmlSign {
+public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestXmlSign {
+
+    protected abstract AbsJdkXmlKeyPairSign createJdkXmlSign();
 
     @Override
-    String getTestName() {
+    protected String getTestName() {
         return "keypair";
     }
 
@@ -41,7 +44,6 @@ public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestJdkXmlSign {
     }
 
     private void doTestKeyPairForSignatureMethod(KeyPair keypair, String method) throws Exception {
-        File tmpFolder = new File(System.getProperty("java.io.tmpdir"), getTestName());
         String[] digestMethods = new String[] { DigestMethod.SHA1, DigestMethod.SHA256, DigestMethod.SHA512 };
 
         for (String dm : digestMethods) {
@@ -57,10 +59,15 @@ public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestJdkXmlSign {
 
             String name = "demo-" + getTestName() + "_" + method.substring(method.lastIndexOf('#') + 1) + '-'
                     + dm.substring(dm.lastIndexOf('#') + 1) + ".xml";
-            file(signedDoc, new File(tmpFolder, name));
+            file(signedDoc, new File(tempDir, name));
 
             boolean valid = sign.valid(signedDoc);
             assertTrue("Valid failure with DigestMethod: " + dm + ", signatureMethod: " + method, valid);
+
+            Document signedDoc2 = sign.sign(signedDoc);
+            file(signedDoc, new File(tempDir, 2 + name));
+            boolean valid2 = sign.valid(signedDoc2);
+            assertTrue("Valid failure again with DigestMethod: " + dm + ", signatureMethod: " + method, valid2);
         }
     }
 
