@@ -26,6 +26,10 @@ public abstract class AbsTestXmlSign extends AbsTestParent {
 
     protected static final String PATH_XML = "/xml/";
 
+    protected static final String FILE_SHOPPING_NAME = "shopping";
+
+    protected static final String FILE_SHOPPING = FILE_SHOPPING_NAME + IXmlSign.EXT_XML;
+
     protected Document loadXmlDoc(String path) throws ParserConfigurationException, SAXException, IOException {
         InputStream stream = this.getClass().getResourceAsStream(PATH_XML + path);
 
@@ -47,6 +51,10 @@ public abstract class AbsTestXmlSign extends AbsTestParent {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.transform(new DOMSource(doc), new StreamResult(new FileOutputStream(file)));
+    }
+
+    protected String getFilePart() {
+        return FILE_SHOPPING_NAME + '-' + getTestName();
     }
 
     protected abstract String getTestName();

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGl
+ODJ6+SfaPg==</DigestValue></Reference></SignedInfo><SignatureValue>FkBKP9/mFdPMzH4gV0Ve2B74AMohnlYt/2VdIAdlGtyFV09wXHC0Dw==</SignatureValue><KeyInfo><KeyValue><DSAKeyValue><P>/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuA
+HTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOu
+K2HXKu/yIgMZndFIAcc=</P><Q>l2BQjxUjC8yykrmCouuEC/BYHPU=</Q><G>9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJFnEj6EwoFhO3
+zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImog9/hWuWfBpKL
+Zl6Ae1UlZAFMO/7PSSo=</G><Y>idzPR0y/EJrx7KEoQImJnFw+MNOPjMgSJi18rVVqVW+nJYYq+WpQvP+2xKm3EVxolBVYYs2r9eV5
+JhzdRDZAc2YhXUbrXVFzuE7g9i2MqB8Rmk1X4wBDJV4ABiA7weEdv4GDB3fXp9nVNuw/UZ1clVSs
+xnJ6rJMvFVnw8dIMlks=</Y></DSAKeyValue></KeyValue></KeyInfo><Object><PurchaseOrder xmlns="http://www.kemix.xyz/2017/xmlsign#">
+	<Items>
+		<Item Code="001-002-001" Quantity="2">
+			cake
+		</Item>
+		<Item Code="001-005-002" Quantity="6">
+			beer
+		</Item>
+	</Items>
+	<ShippingAddress>
+		Beijing, China
+	</ShippingAddress>
+	<PaymentInfo>
+		<BillingAddress>
+			Beijing, China
+		</BillingAddress>
+		<CreditCard Type="VISA">
+			<Name>Kemix Koo</Name>
+			<Number>1234 567890 12345</Number>
+			<Expires Month="2" Year="2020"/>
+		</CreditCard>
+	</PaymentInfo>
+</PurchaseOrder></Object></Signature>

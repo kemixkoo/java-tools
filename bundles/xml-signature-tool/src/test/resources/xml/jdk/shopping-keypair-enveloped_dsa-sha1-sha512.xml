@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><PurchaseOrder xmlns="http://www.kemix.xyz/2017/xmlsign#">
+	<Items>
+		<Item Code="001-002-001" Quantity="2">
+			cake
+		</Item>
+		<Item Code="001-005-002" Quantity="6">
+			beer
+		</Item>
+	</Items>
+	<ShippingAddress>
+		Beijing, China
+	</ShippingAddress>
+	<PaymentInfo>
+		<BillingAddress>
+			Beijing, China
+		</BillingAddress>
+		<CreditCard Type="VISA">
+			<Name>Kemix Koo</Name>
+			<Number>1234 567890 12345</Number>
+			<Expires Month="2" Year="2020"/>
+		</CreditCard>
+	</PaymentInfo>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>OtFV9JN0QoZmym1VkhIKN77aHcdxBOy159WEIBrlTvGRD4j85ZWxDFXt3N3UATDt9DDRslHzLxDK
+rQL3FjcANg==</DigestValue></Reference></SignedInfo><SignatureValue>W3AD4iV5sjv2odBgTLh13yPkJ9+K2iXWylmLnZih4CaaHnbo8ItjrA==</SignatureValue><KeyInfo><KeyValue><DSAKeyValue><P>/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuA
+HTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOu
+K2HXKu/yIgMZndFIAcc=</P><Q>l2BQjxUjC8yykrmCouuEC/BYHPU=</Q><G>9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJFnEj6EwoFhO3
+zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImog9/hWuWfBpKL
+Zl6Ae1UlZAFMO/7PSSo=</G><Y>GGCGkWv3B0+qvhsEmUTZ9Rzn4ZVLotHZnfDKcM/X2YdfZribSG/5bb4TqO/BwWHUs6L43vuJZ2dS
+Dsrb4rHo3keUFEte8YvEBO+Uh1JZBLGF3eveTx2/JsiGSBTHuvSnT1pPobnJpVHVCBo34rU+xqGt
+gy1vrdW6T0vg+W3+cjM=</Y></DSAKeyValue></KeyValue></KeyInfo></Signature></PurchaseOrder>

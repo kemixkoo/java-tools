@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import xyz.kemix.xml.sign.AbsTestXmlSign;
+import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.KeyStoreSetting;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
@@ -69,7 +70,7 @@ public abstract class AbsTestJdkXmlKeyStoreSign extends AbsTestXmlSign {
         String[] digestMethods = new String[] { DigestMethod.SHA1, DigestMethod.SHA256, DigestMethod.SHA512 };
 
         for (String dm : digestMethods) {
-            Document doc = loadXmlDoc("demo.xml");
+            Document doc = loadXmlDoc(FILE_SHOPPING);
             assertNotNull(doc);
             URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + storeFileName);
             assertNotNull(storeUrl);
@@ -84,19 +85,19 @@ public abstract class AbsTestJdkXmlKeyStoreSign extends AbsTestXmlSign {
 
             Document signedDoc = sign.sign(doc);
 
-            String name = "demo-" + getTestName() + "_" + method.substring(method.lastIndexOf('#') + 1) + '-'
-                    + dm.substring(dm.lastIndexOf('#') + 1) + ".xml";
-            file(signedDoc, new File(tempDir, name));
+            String name = getFilePart() + "_" + method.substring(method.lastIndexOf('#') + 1) + '-'
+                    + dm.substring(dm.lastIndexOf('#') + 1);
+            file(signedDoc, new File(tempDir, name + IXmlSign.EXT_XML));
 
             boolean valid = sign.valid(signedDoc);
             assertTrue("Valid failure with DigestMethod: " + dm + ", signatureMethod: " + method, valid);
 
             Document signedDoc2 = sign.sign(signedDoc);
             boolean valid2 = sign.valid(signedDoc2);
-            file(signedDoc, new File(tempDir, 2 + name));
+            // file(signedDoc, new File(tempDir, name + 2 + IXmlSign.EXT_XML));
             assertTrue("Valid failure again with DigestMethod: " + dm + ", signatureMethod: " + method, valid2);
-
         }
+        System.out.println();
     }
 
 }

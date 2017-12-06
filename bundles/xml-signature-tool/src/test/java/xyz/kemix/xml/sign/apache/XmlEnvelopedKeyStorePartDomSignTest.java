@@ -32,21 +32,21 @@ public class XmlEnvelopedKeyStorePartDomSignTest extends AbsTestXmlEnvelopedKeyS
 
     @Test
     public void test_valid() throws Exception {
-        doTestValid_PaymentInfo("apache/shopping_keystore-enveloped-part_dsa-sha256_sha1.xml", true);
+        doTestValid_PaymentInfo(PATH_APACHE + getFilePart() + "_dsa-sha256-sha1.xml", true);
     }
 
     @Test
     public void test_valid_other() throws Exception {
-        doTestValid_PaymentInfo("apache/shopping_keystore-enveloped-part_dsa-sha256_sha1-other.xml", true);
+        doTestValid_PaymentInfo(PATH_APACHE + getFilePart() + "_dsa-sha256-sha1-other.xml", true);
     }
 
     @Test
     public void test_valid_modified() throws Exception {
-        doTestValid_PaymentInfo("apache/shopping_keystore-enveloped-part_dsa-sha256_sha1-modified.xml", false);
+        doTestValid_PaymentInfo(PATH_APACHE + getFilePart() + "_dsa-sha256-sha1-modified.xml", false);
     }
 
     @Test
     public void test_valid_format() throws Exception {
-        doTestValid_PaymentInfo("apache/shopping_keystore-enveloped-part_dsa-sha256_sha1-format.xml", false);
+        doTestValid_PaymentInfo(PATH_APACHE + getFilePart() + "_dsa-sha256-sha1-format.xml", false);
     }
 }

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><demo>
-	<hello>World</hello>
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>AKYMWrgkmCnPfXib93GVZh8B/PM=</DigestValue></Reference></SignedInfo><SignatureValue>hfWaLu5VKJ3JOBaX7abOXNeZWxmaiZuY0QCOFuNTR9+9CLaPY7CifnXdQc0GMM1X5dmfPGPhXsyr
-wvPTjdloqayDhO0AmCXqUqeNo7yCgLRWe3NtANUDQaexwTfrjtg0EIyQG30tP+vYaFHL9qa5sAlm
-+6HtpdBRE0hJ3fF0M38=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>oWme862GfefRImvEZwhLqs0G8bqMmjQsSIM9EcfUClBZTcKIxqWyDT7lzgf2W0XaRGF5Gk1OLVko
-HT4oeR6+j+aOLduEPHZR+xaEkgZkaWoVMwfxn9qyy4WFLlAims7umNebXY+bFu2d58thO/8ce79s
-EeSpHPLSOMQR0kS1R5M=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo></Signature></demo>

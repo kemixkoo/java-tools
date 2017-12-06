@@ -31,36 +31,11 @@ public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
         String baseUrl = "";
         final XMLSignature sig = new XMLSignature(doc, baseUrl, getSignatureMethodURI(), getCanonicalizationMethodURI());
         //
-        boolean newDoc = true;// new doc without sign
-        Element sigElement = getSignatureNode(doc);
-        if (sigElement != null) {
-            doc.getOwnerDocument().removeChild(sigElement);
-            newDoc = false;
-        }
-        //
         NodeList childNodes = doc.getDocumentElement().getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if (item.getNodeType() == Node.ELEMENT_NODE) {
                 Element elementToSign = (Element) item;
-                if (newDoc) {
-                    String id = UUID.randomUUID().toString();
-                    elementToSign.setAttributeNS(null, Constants._ATT_ID, id);
-                    elementToSign.setIdAttributeNS(null, Constants._ATT_ID, true);
-
-                    Transforms transforms = new Transforms(doc);
-                    transforms.addTransform(Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-                    sig.addDocument("#" + id, transforms);
-                } else {
-                    Attr idAttr = elementToSign.getAttributeNode(Constants._ATT_ID);
-                    if (idAttr != null) { // ignore without id nodes for signed doc.
-                        elementToSign.setIdAttributeNS(null, Constants._ATT_ID, true);
-                        Transforms transforms = new Transforms(doc);
-                        transforms.addTransform(Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-                        sig.addDocument("#" + idAttr.getTextContent(), transforms);
-                    }
-                }
-
                 String id = UUID.randomUUID().toString();
                 elementToSign.setAttributeNS(null, Constants._ATT_ID, id);
                 elementToSign.setIdAttributeNS(null, Constants._ATT_ID, true);
@@ -68,6 +43,7 @@ public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
                 Transforms transforms = new Transforms(doc);
                 transforms.addTransform(Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
                 sig.addDocument("#" + id, transforms);
+
             }
         }
         //
@@ -88,27 +64,28 @@ public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
     }
 
     public boolean valid(Document doc) throws Exception {
-        final KeyStore keyStore = KeyStore.getInstance(getStoreSetting().getStoreType());
-        keyStore.load(getStoreSetting().getStoreUrl().openStream(), getStoreSetting().getStorePassword());
-        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
-
+        // create XMLSignature
         final Element sigElement = getSignatureNode(doc);
+        String baseUrl = "";
+        XMLSignature signature = new XMLSignature(sigElement, baseUrl);
 
-        //
+        // set for signed elements
         NodeList childNodes = doc.getDocumentElement().getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if (item.getNodeType() == Node.ELEMENT_NODE) {
                 Element elementToSign = (Element) item;
                 Attr idAttr = elementToSign.getAttributeNode(Constants._ATT_ID);
-                if (idAttr != null) {
+                if (idAttr != null) {// only check the node with Id
                     elementToSign.setIdAttributeNS(null, Constants._ATT_ID, true);
                 }
             }
         }
 
-        String baseUrl = "";
-        XMLSignature signature = new XMLSignature(sigElement, baseUrl);
+        // load keystore
+        final KeyStore keyStore = KeyStore.getInstance(getStoreSetting().getStoreType());
+        keyStore.load(getStoreSetting().getStoreUrl().openStream(), getStoreSetting().getStorePassword());
+        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
 
         return signature.checkSignatureValue(cert);
     }

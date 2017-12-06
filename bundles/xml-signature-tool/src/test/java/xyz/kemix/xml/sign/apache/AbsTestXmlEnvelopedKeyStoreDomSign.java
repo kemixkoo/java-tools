@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import xyz.kemix.xml.sign.AbsTestXmlSign;
+import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.KeyStoreSetting;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
@@ -22,6 +23,8 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
  *
  */
 public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign {
+
+    static final String PATH_APACHE = "apache/";
 
     @Override
     protected String getTestName() {
@@ -58,7 +61,7 @@ public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign 
 
     @Test
     public void test_sign_valid_IT() throws Exception {
-        Document doc = loadXmlDoc("shopping.xml");
+        Document doc = loadXmlDoc(FILE_SHOPPING);
         assertNotNull(doc);
 
         AbsXmlKeyStoreSign sign = createSign();
@@ -66,7 +69,7 @@ public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign 
 
         Document signedDoc = sign.sign(doc);
 
-        file(signedDoc, new File(tempDir, "shooping-" + getTestName() + "-1.xml"));
+        file(signedDoc, new File(tempDir, getFilePart() + IXmlSign.EXT_XML));
 
         boolean valid = sign.valid(signedDoc);
         assertTrue("Valid failure", valid);
@@ -74,7 +77,7 @@ public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign 
         // try sign again
         Document signedDoc2 = sign.sign(signedDoc);
 
-        file(signedDoc2, new File(tempDir, "shooping-" + getTestName() + "-2.xml"));
+        file(signedDoc2, new File(tempDir, getFilePart() + 2 + IXmlSign.EXT_XML));
 
         boolean valid2 = sign.valid(signedDoc2);
         assertTrue("Valid failure when sign again", valid2);

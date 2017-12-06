@@ -10,6 +10,8 @@ import org.w3c.dom.Document;
  */
 public interface IXmlSign {
 
+    String EXT_XML = ".xml";
+
     Document sign(Document doc) throws Exception;
 
     boolean valid(Document doc) throws Exception;

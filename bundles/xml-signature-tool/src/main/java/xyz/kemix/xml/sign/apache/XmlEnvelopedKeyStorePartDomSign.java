@@ -123,9 +123,9 @@ public class XmlEnvelopedKeyStorePartDomSign extends AbsXmlKeyStoreSign {
 
     public boolean valid(Document doc) throws Exception {
         // create XMLSignature
-        Element sigElement = getSignatureNode(doc);
+        final Element sigElement = getSignatureNode(doc);
         String baseUrl = "";
-        XMLSignature signature = new XMLSignature(sigElement, baseUrl);
+        final XMLSignature signature = new XMLSignature(sigElement, baseUrl);
 
         // set for signed elements
         XPathFactory xpf = XPathFactory.newInstance();

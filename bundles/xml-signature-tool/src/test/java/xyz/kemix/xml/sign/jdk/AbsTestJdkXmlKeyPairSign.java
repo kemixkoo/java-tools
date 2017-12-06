@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import xyz.kemix.xml.sign.AbsTestXmlSign;
+import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.jdk.key.DSAKeyPairGen;
 import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
 
@@ -23,6 +24,8 @@ import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
  *
  */
 public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestXmlSign {
+
+    static final String PATH_JDK = "jdk/";
 
     protected abstract AbsJdkXmlKeyPairSign createJdkXmlSign();
 
@@ -47,7 +50,7 @@ public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestXmlSign {
         String[] digestMethods = new String[] { DigestMethod.SHA1, DigestMethod.SHA256, DigestMethod.SHA512 };
 
         for (String dm : digestMethods) {
-            Document doc = loadXmlDoc("demo.xml");
+            Document doc = loadXmlDoc(FILE_SHOPPING);
             assertNotNull(doc);
 
             AbsJdkXmlKeyPairSign sign = (AbsJdkXmlKeyPairSign) createJdkXmlSign();
@@ -57,15 +60,15 @@ public abstract class AbsTestJdkXmlKeyPairSign extends AbsTestXmlSign {
             sign.setKeypair(keypair);
             Document signedDoc = sign.sign(doc);
 
-            String name = "demo-" + getTestName() + "_" + method.substring(method.lastIndexOf('#') + 1) + '-'
-                    + dm.substring(dm.lastIndexOf('#') + 1) + ".xml";
-            file(signedDoc, new File(tempDir, name));
+            String name = getFilePart() + "_" + method.substring(method.lastIndexOf('#') + 1) + '-'
+                    + dm.substring(dm.lastIndexOf('#') + 1);
+            file(signedDoc, new File(tempDir, name + IXmlSign.EXT_XML));
 
             boolean valid = sign.valid(signedDoc);
             assertTrue("Valid failure with DigestMethod: " + dm + ", signatureMethod: " + method, valid);
 
             Document signedDoc2 = sign.sign(signedDoc);
-            file(signedDoc, new File(tempDir, 2 + name));
+            // file(signedDoc, new File(tempDir, name +'-'+ 2 + IXmlSign.EXT_XML));
             boolean valid2 = sign.valid(signedDoc2);
             assertTrue("Valid failure again with DigestMethod: " + dm + ", signatureMethod: " + method, valid2);
         }

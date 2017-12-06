@@ -11,6 +11,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 
@@ -34,7 +35,7 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
 
     @Test
     public void test_valid_keyPair_DSA() throws Exception {
-        Document doc = loadXmlDoc("jdk/demo-" + getTestName() + "_dsa-sha1-sha512.xml");
+        Document doc = loadXmlDoc(AbsTestJdkXmlKeyPairSign.PATH_JDK + getFilePart() + "_dsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
         AbsJdkXmlKeyStoreSign sign = createJdkXmlSign();
@@ -52,7 +53,7 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
 
     @Test
     public void test_valid_keyPair_RSA() throws Exception {
-        Document doc = loadXmlDoc("jdk/demo-" + getTestName() + "_rsa-sha1-sha512.xml");
+        Document doc = loadXmlDoc(AbsTestJdkXmlKeyPairSign.PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
         AbsJdkXmlKeyStoreSign sign = createJdkXmlSign();

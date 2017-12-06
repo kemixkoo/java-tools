@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>2jmj7l5rSw0yVb/vlWAYkK/YBwk=</DigestValue></Reference></SignedInfo><SignatureValue>eJ/z+dsg5fylBeSi8BvZ+fb7yxw2d7cpwDOXEjnmQQOUv9iI+/TnabmEva0ed1SulDgRBWsdZamC
+Q+LOnBvbYCOQz0eNde5E+LabAGZvU3keJZlt62dxIxeloeI8FfoeRWbq3tlCa19frf9nbS0ztXS4
+yGS5T3O248s3xETc89s=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>qzbm4uMfiNe1XU2fZLIS3pVT6opYuxThGcQh5uUVVCjIrphHj9wkf2jt3stcw0mJK0FqQIjmGONs
+GF6ARqepx3JGaSSPcvqq0hT7uGoe7voGtt5B1jZLPOoqBFvvypr/1tQ7E8Eyh8gDZed825posLnR
+vq8kMuUA1V2rKQGrUnE=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo><Object><PurchaseOrder xmlns="http://www.kemix.xyz/2017/xmlsign#">
+	<Items>
+		<Item Code="001-002-001" Quantity="2">
+			cake
+		</Item>
+		<Item Code="001-005-002" Quantity="6">
+			beer
+		</Item>
+	</Items>
+	<ShippingAddress>
+		Beijing, China
+	</ShippingAddress>
+	<PaymentInfo>
+		<BillingAddress>
+			Beijing, China
+		</BillingAddress>
+		<CreditCard Type="VISA">
+			<Name>Kemix Koo</Name>
+			<Number>1234 567890 12345</Number>
+			<Expires Month="2" Year="2020"/>
+		</CreditCard>
+	</PaymentInfo>
+</PurchaseOrder></Object></Signature>
