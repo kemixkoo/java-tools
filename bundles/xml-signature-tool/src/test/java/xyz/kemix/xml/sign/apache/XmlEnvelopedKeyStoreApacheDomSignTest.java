@@ -8,11 +8,11 @@ import org.junit.Test;
  * Created at 2017-12-05
  *
  */
-public class XmlEnvelopedKeyStoreDomSignTest extends AbsTestXmlEnvelopedKeyStoreDomSign {
+public class XmlEnvelopedKeyStoreApacheDomSignTest extends AbsTestXmlEnvelopedKeyStoreApacheDomSign {
 
     @Override
-    protected AbsXmlKeyStoreSign createSign() {
-        return new XmlEnvelopedKeyStoreDomSign();
+    protected AbsXmlKeyStoreApacheDomSign createSign() {
+        return new XmlEnvelopedKeyStoreApacheDomSign();
     }
 
     @Test

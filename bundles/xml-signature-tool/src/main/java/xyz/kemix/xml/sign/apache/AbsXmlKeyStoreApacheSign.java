@@ -10,8 +10,6 @@ import org.apache.xml.security.Init;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.Constants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.KeyStoreSetting;
@@ -22,7 +20,7 @@ import xyz.kemix.xml.sign.KeyStoreSetting;
  * Created at 2017-12-01
  *
  */
-public abstract class AbsXmlKeyStoreSign implements IXmlSign {
+public abstract class AbsXmlKeyStoreApacheSign implements IXmlSign {
 
     /**
      * support
@@ -72,21 +70,4 @@ public abstract class AbsXmlKeyStoreSign implements IXmlSign {
         return keyStore;
     }
 
-    public final Document sign(Document doc) throws Exception {
-        beforeSign(doc);
-        return doSign(doc);
-    }
-
-    protected abstract Document doSign(Document doc) throws Exception;
-
-    protected void beforeSign(Document doc) throws Exception {
-        Element signatureNode = getSignatureNode(doc);
-        if (signatureNode != null) {// signed doc, not new doc, so try to remove and re-sign
-            doc.getDocumentElement().removeChild(signatureNode);
-        }
-    }
-
-    protected abstract Element getSignatureNode(Document doc) throws Exception;
-
-    public abstract boolean valid(Document doc) throws Exception;
 }

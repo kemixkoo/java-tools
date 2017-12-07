@@ -6,11 +6,11 @@ package xyz.kemix.xml.sign.jdk;
  * Created at 2017-11-29
  *
  */
-public class JdkXmlEnvelopingKeyPairSignTest extends AbsTestJdkXmlKeyPairSign {
+public class XmlEnvelopingKeyPairJdkDomSignTest extends AbsTestXmlKeyPairJdkDomSign {
 
     @Override
-    protected AbsJdkXmlKeyPairSign createJdkXmlSign() {
-        return new JdkXmlEnvelopingKeyPairSign();
+    protected AbsXmlKeyPairJdkDomSign createJdkXmlSign() {
+        return new XmlEnvelopingKeyPairJdkDomSign();
     }
 
     @Override

@@ -21,7 +21,7 @@ import org.w3c.dom.Document;
  * Created at 2017-11-30
  *
  */
-public class JdkXmlEnvelopedKeyStoreSign extends AbsJdkXmlKeyStoreSign {
+public class XmlEnvelopedKeyStoreJdkDomSign extends AbsXmlKeyStoreJdkDomSign {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Document doSign(Document doc) throws Exception {

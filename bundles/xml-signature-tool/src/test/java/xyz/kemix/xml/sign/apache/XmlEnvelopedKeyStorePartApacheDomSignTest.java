@@ -10,11 +10,11 @@ import org.junit.Test;
  * Created at 2017-12-05
  *
  */
-public class XmlEnvelopedKeyStorePartDomSignTest extends AbsTestXmlEnvelopedKeyStoreDomSign {
+public class XmlEnvelopedKeyStorePartApacheDomSignTest extends AbsTestXmlEnvelopedKeyStoreApacheDomSign {
 
     @Override
-    protected AbsXmlKeyStoreSign createSign() {
-        return new XmlEnvelopedKeyStorePartDomSign();
+    protected AbsXmlKeyStoreApacheDomSign createSign() {
+        return new XmlEnvelopedKeyStorePartApacheDomSign();
     }
 
     @Override
@@ -23,10 +23,10 @@ public class XmlEnvelopedKeyStorePartDomSignTest extends AbsTestXmlEnvelopedKeyS
     }
 
     @Override
-    protected void setKeyStoreSettings(AbsXmlKeyStoreSign sign) {
+    protected void setKeyStoreSettings(AbsXmlKeyStoreApacheSign sign) {
         super.setKeyStoreSettings(sign);
 
-        ((XmlEnvelopedKeyStorePartDomSign) sign).getNamesToSign().add(
+        ((XmlEnvelopedKeyStorePartApacheDomSign) sign).getNamesToSign().add(
                 new QName("http://www.kemix.xyz/2017/xmlsign#", "PaymentInfo"));
     }
 

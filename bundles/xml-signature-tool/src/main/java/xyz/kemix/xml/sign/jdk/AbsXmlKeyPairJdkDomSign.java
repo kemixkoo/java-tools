@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsJdkXmlKeyPairSign extends AbsJdkXmlSign {
+public abstract class AbsXmlKeyPairJdkDomSign extends AbsXmlJdkDomSign {
 
     private KeyPair keypair;
 
@@ -46,6 +46,9 @@ public abstract class AbsJdkXmlKeyPairSign extends AbsJdkXmlSign {
     public boolean valid(Document doc) throws Exception {
         // find signature node
         final Node signatureNode = getSignatureNode(doc);
+        if (signatureNode != null) {
+            return false;
+        }
         XMLSignature signature = SIGN_FACTORY.unmarshalXMLSignature(new DOMStructure(signatureNode));
 
         PublicKey pubKey = ((KeyValue) signature.getKeyInfo().getContent().get(0)).getPublicKey();

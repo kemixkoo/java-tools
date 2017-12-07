@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
  * <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> .............. <Data> .............. </Data> </Signature>
  */
 @SuppressWarnings("nls")
-public class JdkXmlEnvelopingKeyPairSign extends AbsJdkXmlKeyPairSign {
+public class XmlEnvelopingKeyPairJdkDomSign extends AbsXmlKeyPairJdkDomSign {
 
     @Override
     protected void beforeSign(Document doc) {

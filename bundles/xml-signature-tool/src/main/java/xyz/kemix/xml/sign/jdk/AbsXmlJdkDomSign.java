@@ -27,7 +27,7 @@ import xyz.kemix.xml.sign.IXmlSign;
  * Created at 2017-11-29
  *
  */
-public abstract class AbsJdkXmlSign implements IXmlSign {
+public abstract class AbsXmlJdkDomSign implements IXmlSign {
 
     /**
      * support for SHA1, SHA256, SHA512

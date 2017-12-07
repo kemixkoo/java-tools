@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
  * <Data> .............. <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> .............. </Signature> </Data>
  */
 @SuppressWarnings("nls")
-public class JdkXmlEnvelopedKeyPairSign extends AbsJdkXmlKeyPairSign {
+public class XmlEnvelopedKeyPairJdkDomSign extends AbsXmlKeyPairJdkDomSign {
 
     /**
      * After sign, will add one Signature node in the end of XML doc. The sign value and public key will be stored in

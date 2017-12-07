@@ -32,9 +32,9 @@ import org.w3c.dom.NodeList;
  *
  */
 @SuppressWarnings("nls")
-public class XmlEnvelopedKeyStorePartDomSign extends AbsXmlKeyStoreSign {
+public class XmlEnvelopedKeyStorePartApacheDomSign extends AbsXmlKeyStoreApacheDomSign {
 
-    private static final String SHORT_DS_NS = "ds";
+    protected static final String SHORT_DS_NS = "ds";
 
     static class DSNamespaceContext implements NamespaceContext {
 
@@ -124,6 +124,9 @@ public class XmlEnvelopedKeyStorePartDomSign extends AbsXmlKeyStoreSign {
     public boolean valid(Document doc) throws Exception {
         // create XMLSignature
         final Element sigElement = getSignatureNode(doc);
+        if (sigElement == null) {
+            return false;
+        }
         String baseUrl = "";
         final XMLSignature signature = new XMLSignature(sigElement, baseUrl);
 

@@ -21,11 +21,11 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
  * Created at 2017-11-29
  *
  */
-public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
+public class XmlEnvelopedKeyStoreJdkDomSignTest extends AbsTestXmlKeyStoreJdkDomSign {
 
     @Override
-    protected AbsJdkXmlKeyStoreSign createJdkXmlSign() {
-        return new JdkXmlEnvelopedKeyStoreSign();
+    protected AbsXmlKeyStoreJdkDomSign createJdkXmlSign() {
+        return new XmlEnvelopedKeyStoreJdkDomSign();
     }
 
     @Override
@@ -35,10 +35,10 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
 
     @Test
     public void test_valid_keyPair_DSA() throws Exception {
-        Document doc = loadXmlDoc(AbsTestJdkXmlKeyPairSign.PATH_JDK + getFilePart() + "_dsa-sha1-sha512" + IXmlSign.EXT_XML);
+        Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_dsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsJdkXmlKeyStoreSign sign = createJdkXmlSign();
+        AbsXmlKeyStoreJdkDomSign sign = createJdkXmlSign();
 
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.DSA_SHA1);
@@ -53,10 +53,10 @@ public class JdkXmlEnvelopedKeyStoreSignTest extends AbsTestJdkXmlKeyStoreSign {
 
     @Test
     public void test_valid_keyPair_RSA() throws Exception {
-        Document doc = loadXmlDoc(AbsTestJdkXmlKeyPairSign.PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
+        Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsJdkXmlKeyStoreSign sign = createJdkXmlSign();
+        AbsXmlKeyStoreJdkDomSign sign = createJdkXmlSign();
 
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.RSA_SHA1);

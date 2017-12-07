@@ -18,7 +18,7 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsJdkXmlKeyStoreSign extends AbsJdkXmlSign {
+public abstract class AbsXmlKeyStoreJdkDomSign extends AbsXmlJdkDomSign {
 
     private final KeyStoreSetting keystoreSetting = new KeyStoreSetting();
 
@@ -28,11 +28,14 @@ public abstract class AbsJdkXmlKeyStoreSign extends AbsJdkXmlSign {
 
     @Override
     public boolean valid(Document doc) throws Exception {
+        // find signature node
+        final Node signatureNode = getSignatureNode(doc);
+        if (signatureNode != null) {
+            return false;
+        }
         final PublicKey publicKey = KeyStoreUtil.getPublicKey(getKeystoreSetting().getStoreUrl(), getKeystoreSetting()
                 .getStoreType(), getKeystoreSetting().getStorePassword(), getKeystoreSetting().getKeyAlias());
 
-        // find signature node
-        final Node signatureNode = getSignatureNode(doc);
         XMLSignature signature = SIGN_FACTORY.unmarshalXMLSignature(new DOMStructure(signatureNode));
         DOMValidateContext valContext = new DOMValidateContext(publicKey, signatureNode);
 

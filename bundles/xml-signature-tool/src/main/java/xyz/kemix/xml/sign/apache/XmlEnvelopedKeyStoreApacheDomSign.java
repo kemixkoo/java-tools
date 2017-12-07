@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
  * Created at 2017-12-01
  *
  */
-public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
+public class XmlEnvelopedKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheDomSign {
 
     @Override
     public Document doSign(Document doc) throws Exception {
@@ -50,8 +50,7 @@ public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
         doc.getDocumentElement().appendChild(sig.getElement());
 
         // keystore
-        final KeyStore keyStore = KeyStore.getInstance(getStoreSetting().getStoreType());
-        keyStore.load(getStoreSetting().getStoreUrl().openStream(), getStoreSetting().getStorePassword());
+        final KeyStore keyStore = loadKeyStore();
         final Key key = keyStore.getKey(getStoreSetting().getKeyAlias(), getStoreSetting().getKeyPassword());
         final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
 
@@ -66,6 +65,9 @@ public class XmlEnvelopedKeyStoreDomSign extends AbsXmlKeyStoreSign {
     public boolean valid(Document doc) throws Exception {
         // create XMLSignature
         final Element sigElement = getSignatureNode(doc);
+        if (sigElement == null) {
+            return false;
+        }
         String baseUrl = "";
         XMLSignature signature = new XMLSignature(sigElement, baseUrl);
 

@@ -26,16 +26,16 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsTestJdkXmlKeyStoreSign extends AbsTestXmlSign {
+public abstract class AbsTestXmlKeyStoreJdkDomSign extends AbsTestXmlSign {
 
-    protected abstract AbsJdkXmlKeyStoreSign createJdkXmlSign();
+    protected abstract AbsXmlKeyStoreJdkDomSign createJdkXmlSign();
 
     @Override
     protected String getTestName() {
         return "keystore";
     }
 
-    void setStore(AbsJdkXmlKeyStoreSign sign, URL storeUrl) throws IOException {
+    void setStore(AbsXmlKeyStoreJdkDomSign sign, URL storeUrl) throws IOException {
         KeyStoreSetting keystoreSetting = sign.getKeystoreSetting();
         keystoreSetting.setStoreUrl(storeUrl);
         keystoreSetting.setStorePassword(KeyStoreUtilTest.storePassword);
@@ -75,7 +75,7 @@ public abstract class AbsTestJdkXmlKeyStoreSign extends AbsTestXmlSign {
             URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + storeFileName);
             assertNotNull(storeUrl);
 
-            AbsJdkXmlKeyStoreSign sign = (AbsJdkXmlKeyStoreSign) createJdkXmlSign();
+            AbsXmlKeyStoreJdkDomSign sign = (AbsXmlKeyStoreJdkDomSign) createJdkXmlSign();
 
             sign.setDigestMethod(dm);
             sign.setSignatureMethod(method);

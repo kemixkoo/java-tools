@@ -5,16 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.net.URL;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import xyz.kemix.xml.sign.AbsTestXmlSign;
 import xyz.kemix.xml.sign.IXmlSign;
-import xyz.kemix.xml.sign.KeyStoreSetting;
-import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
-import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -22,22 +17,20 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
  * Created at 2017-12-05
  *
  */
-public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign {
-
-    static final String PATH_APACHE = "apache/";
+public abstract class AbsTestXmlEnvelopedKeyStoreApacheDomSign extends AbsTestXmlKeyStoreApacheSign {
 
     @Override
     protected String getTestName() {
-        return "keystore-enveloped";
+        return super.getTestName() + "-enveloped";
     }
 
-    protected abstract AbsXmlKeyStoreSign createSign();
+    protected abstract AbsXmlKeyStoreApacheDomSign createSign();
 
     protected void doTestValid_PaymentInfo(String path, boolean flag) throws Exception {
         Document signedDoc = loadXmlDoc(path);
         assertNotNull(signedDoc);
 
-        AbsXmlKeyStoreSign sign = createSign();
+        AbsXmlKeyStoreApacheDomSign sign = createSign();
 
         setKeyStoreSettings(sign);
 
@@ -49,22 +42,12 @@ public abstract class AbsTestXmlEnvelopedKeyStoreDomSign extends AbsTestXmlSign 
         }
     }
 
-    protected void setKeyStoreSettings(AbsXmlKeyStoreSign sign) {
-        KeyStoreSetting storeSetting = sign.getStoreSetting();
-        storeSetting.setStoreType(KeyStoreUtil.JKS);
-        URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + "kemix-dsa.jks");
-        storeSetting.setStoreUrl(storeUrl);
-        storeSetting.setStorePassword(KeyStoreUtilTest.storePassword);
-        storeSetting.setKeyAlias(KeyStoreUtilTest.keyAlias);
-        storeSetting.setKeyPassword(KeyStoreUtilTest.keyPassword);
-    }
-
     @Test
     public void test_sign_valid_IT() throws Exception {
         Document doc = loadXmlDoc(FILE_SHOPPING);
         assertNotNull(doc);
 
-        AbsXmlKeyStoreSign sign = createSign();
+        AbsXmlKeyStoreApacheDomSign sign = createSign();
         setKeyStoreSettings(sign);
 
         Document signedDoc = sign.sign(doc);
