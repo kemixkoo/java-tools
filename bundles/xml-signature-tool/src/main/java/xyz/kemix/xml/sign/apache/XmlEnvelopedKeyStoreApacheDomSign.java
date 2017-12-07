@@ -92,12 +92,4 @@ public class XmlEnvelopedKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheDomSi
         return signature.checkSignatureValue(cert);
     }
 
-    protected Element getSignatureNode(Document doc) throws Exception {
-        NodeList signList = doc.getElementsByTagNameNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
-        if (signList.getLength() == 0) {
-            return null;
-        }
-        final Element signatureNode = (Element) signList.item(0);
-        return signatureNode;
-    }
 }

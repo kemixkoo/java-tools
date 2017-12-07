@@ -1,5 +1,7 @@
 package xyz.kemix.xml.sign.apache;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -10,11 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InboundXMLSec;
@@ -31,6 +38,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -40,7 +49,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
  */
 public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign {
 
-    static class TestSecurityEventListener implements SecurityEventListener {
+    static class StAXSecurityEventListener implements SecurityEventListener {
 
         private List<SecurityEvent> events = new ArrayList<SecurityEvent>();
 
@@ -75,99 +84,6 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
         }
     }
 
-    static class XmlReaderToWriter {
-
-        private XmlReaderToWriter() {
-        }
-
-        public static void writeAll(XMLStreamReader xmlr, XMLStreamWriter writer) throws XMLStreamException {
-            while (xmlr.hasNext()) {
-                xmlr.next();
-                write(xmlr, writer);
-            }
-            // write(xmlr, writer); // write the last element
-            writer.flush();
-        }
-
-        public static void write(XMLStreamReader xmlr, XMLStreamWriter writer) throws XMLStreamException {
-            switch (xmlr.getEventType()) {
-            case XMLEvent.START_ELEMENT:
-                final String localName = xmlr.getLocalName();
-                final String namespaceURI = xmlr.getNamespaceURI();
-                if (namespaceURI != null && namespaceURI.length() > 0) {
-                    final String prefix = xmlr.getPrefix();
-                    if (prefix != null)
-                        writer.writeStartElement(prefix, localName, namespaceURI);
-                    else
-                        writer.writeStartElement(namespaceURI, localName);
-                } else {
-                    writer.writeStartElement(localName);
-                }
-
-                for (int i = 0, len = xmlr.getNamespaceCount(); i < len; i++) {
-                    String prefix = xmlr.getNamespacePrefix(i);
-                    if (prefix == null) {
-                        writer.writeDefaultNamespace(xmlr.getNamespaceURI(i));
-                    } else {
-                        writer.writeNamespace(prefix, xmlr.getNamespaceURI(i));
-                    }
-                }
-
-                for (int i = 0, len = xmlr.getAttributeCount(); i < len; i++) {
-                    final String attUri = xmlr.getAttributeNamespace(i);
-
-                    if (attUri != null && attUri.length() > 0) {
-                        final String prefix = xmlr.getAttributePrefix(i);
-                        if (prefix != null)
-                            writer.writeAttribute(prefix, attUri, xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
-                        else
-                            writer.writeAttribute(attUri, xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
-                    } else {
-                        writer.writeAttribute(xmlr.getAttributeLocalName(i), xmlr.getAttributeValue(i));
-                    }
-
-                }
-                break;
-            case XMLEvent.END_ELEMENT:
-                writer.writeEndElement();
-                break;
-            case XMLEvent.SPACE:
-            case XMLEvent.CHARACTERS:
-                char[] text = new char[xmlr.getTextLength()];
-                xmlr.getTextCharacters(0, text, 0, xmlr.getTextLength());
-                writer.writeCharacters(text, 0, text.length);
-                break;
-            case XMLEvent.PROCESSING_INSTRUCTION:
-                writer.writeProcessingInstruction(xmlr.getPITarget(), xmlr.getPIData());
-                break;
-            case XMLEvent.CDATA:
-                writer.writeCData(xmlr.getText());
-                break;
-            case XMLEvent.COMMENT:
-                writer.writeComment(xmlr.getText());
-                break;
-            case XMLEvent.ENTITY_REFERENCE:
-                writer.writeEntityRef(xmlr.getLocalName());
-                break;
-            case XMLEvent.START_DOCUMENT:
-                String encoding = xmlr.getCharacterEncodingScheme();
-                String version = xmlr.getVersion();
-
-                if (encoding != null && version != null)
-                    writer.writeStartDocument(encoding, version);
-                else if (version != null)
-                    writer.writeStartDocument(xmlr.getVersion());
-                break;
-            case XMLEvent.END_DOCUMENT:
-                writer.writeEndDocument();
-                break;
-            case XMLEvent.DTD:
-                writer.writeDTD(xmlr.getText());
-                break;
-            }
-        }
-    }
-
     private final List<QName> namesToSign = new ArrayList<QName>();
 
     public List<QName> getNamesToSign() {
@@ -183,35 +99,67 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
         }
     }
 
+    protected InputStream removeSignatureNode(InputStream inputStream) throws Exception {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(inputStream);
+            Element signatureNode = getSignatureNode(doc);
+            if (signatureNode != null) {
+                signatureNode.getParentNode().removeChild(signatureNode);
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            //
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.transform(new DOMSource(doc), new StreamResult(baos));
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
+            return bais;
+        } finally {
+            inputStream.close();
+        }
+    }
+
     protected void doSign(InputStream inputStream, OutputStream outputStream) throws Exception {
+        inputStream = removeSignatureNode(inputStream);
+
+        XMLSecurityProperties properties = new XMLSecurityProperties();
+
+        // Set up
+        List<XMLSecurityConstants.Action> actions = new ArrayList<XMLSecurityConstants.Action>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
+        properties.setActions(actions);
+        properties.setSignatureAlgorithm(getSignatureMethodURI());
+
         // load keystore
         final KeyStore keyStore = loadKeyStore();
         final Key key = keyStore.getKey(getStoreSetting().getKeyAlias(), getStoreSetting().getKeyPassword());
         final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
-
-        // Set up the Configuration
-        XMLSecurityProperties properties = new XMLSecurityProperties();
-        List<XMLSecurityConstants.Action> actions = new ArrayList<XMLSecurityConstants.Action>();
-        actions.add(XMLSecurityConstants.SIGNATURE);
-        properties.setActions(actions);
-
-        properties.setSignatureAlgorithm(getSignatureMethodURI());
-        properties.setSignatureCerts(new X509Certificate[] { cert });
         properties.setSignatureKey(key);
+        properties.setSignatureCerts(new X509Certificate[] { cert });
         properties.setSignatureKeyIdentifier(SecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
 
+        // add sign nodes
         for (QName nameToSign : getNamesToSign()) {
             SecurePart securePart = new SecurePart(nameToSign, SecurePart.Modifier.Content);
             properties.addSignaturePart(securePart);
         }
 
-        OutboundXMLSec outboundXMLSec = XMLSec.getOutboundXMLSec(properties);
-        XMLStreamWriter xmlStreamWriter = outboundXMLSec.processOutMessage(outputStream, StandardCharsets.UTF_8.name());
-
+        // create reader
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
 
+        // create writer
+        OutboundXMLSec outboundXMLSec = XMLSec.getOutboundXMLSec(properties);
+        XMLStreamWriter xmlStreamWriter = outboundXMLSec.processOutMessage(outputStream, StandardCharsets.UTF_8.name());
+
+        // sign
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+
         xmlStreamWriter.close();
     }
 
@@ -238,7 +186,7 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
 
         final InboundXMLSec inboundXMLSec = XMLSec.getInboundWSSec(properties);
 
-        final TestSecurityEventListener eventListener = new TestSecurityEventListener();
+        final StAXSecurityEventListener eventListener = new StAXSecurityEventListener();
         final XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
         try {
             XMLStreamReader securityStreamReader = inboundXMLSec.processInMessage(xmlStreamReader, null, eventListener);
@@ -246,6 +194,16 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
             while (securityStreamReader.hasNext()) {
                 securityStreamReader.next();
             }
+        } catch (XMLStreamException e) {
+            if (e.getCause() instanceof XMLSecurityException) {
+                String msgID = ((XMLSecurityException) e.getCause()).getMsgID();
+                if ("errorMessages.InvalidSignatureValueException".equals(msgID)) {
+                    return false; // after format the signed xml, will got this error
+                } else if ("signature.Verification.InvalidDigestOrReference".equals(msgID)) {
+                    return false; // after modified for the sign nodes.
+                }
+            }
+            throw e;
         } finally {
             xmlStreamReader.close();
             stream.close();
@@ -294,4 +252,5 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
 
         return qnames.get(qnames.size() - 1);
     }
+
 }

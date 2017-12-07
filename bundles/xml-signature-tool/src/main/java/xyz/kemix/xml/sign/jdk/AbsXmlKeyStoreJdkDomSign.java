@@ -30,7 +30,7 @@ public abstract class AbsXmlKeyStoreJdkDomSign extends AbsXmlJdkDomSign {
     public boolean valid(Document doc) throws Exception {
         // find signature node
         final Node signatureNode = getSignatureNode(doc);
-        if (signatureNode != null) {
+        if (signatureNode == null) {
             return false;
         }
         final PublicKey publicKey = KeyStoreUtil.getPublicKey(getKeystoreSetting().getStoreUrl(), getKeystoreSetting()
