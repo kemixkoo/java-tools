@@ -92,4 +92,9 @@ public class XmlEnvelopedKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheDomSi
         return signature.checkSignatureValue(cert);
     }
 
+    @Override
+    public boolean validSelf(Document doc) throws Exception {
+        return false;
+    }
+
 }

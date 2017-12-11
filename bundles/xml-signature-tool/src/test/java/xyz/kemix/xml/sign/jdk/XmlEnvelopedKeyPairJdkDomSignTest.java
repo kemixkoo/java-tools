@@ -28,52 +28,53 @@ public class XmlEnvelopedKeyPairJdkDomSignTest extends AbsTestXmlKeyPairJdkDomSi
     }
 
     @Test
-    public void test_valid_keyPair_format() throws Exception {
+    public void test_validSelf_keyPair_format() throws Exception {
         Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512_format" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
         AbsXmlJdkDomSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
+        boolean valid = sign.validSelf(doc);
         assertFalse("After format the Data, won't be valid yet", valid);
     }
 
     @Test
-    public void test_valid_keyPair_modified() throws Exception {
+    public void test_validSelf_keyPair_modified() throws Exception {
         Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512_modified" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsXmlJdkDomSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
+        AbsXmlKeyPairJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
         assertFalse("After change the Data, won't be valid yet", valid);
     }
 
     @Test
-    public void test_valid_keyPair_space_text() throws Exception {
+    public void test_validSelf_keyPair_space_text() throws Exception {
         Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512_space-text" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsXmlJdkDomSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
+        AbsXmlKeyPairJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
         assertFalse("After add one space after <Items> node, won't be valid yet", valid);
     }
 
     @Test
-    public void test_valid_keyPair_space_node() throws Exception {
-        Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512_space-node" + IXmlSign.EXT_XML);
+    public void test_validSelf_keyPair_space_node() throws Exception {
+        Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsXmlJdkDomSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
+        AbsXmlKeyPairJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
         assertTrue("After add one space like <Items >, won't be valid yet", valid);
     }
 
     @Test
-    public void test_valid_keyPair_space_attr() throws Exception {
+    public void test_validSelf_keyPair_space_attr() throws Exception {
         Document doc = loadXmlDoc(PATH_JDK + getFilePart() + "_rsa-sha1-sha512_space-attr" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
-        AbsXmlJdkDomSign sign = createJdkXmlSign();
-        boolean valid = sign.valid(doc);
+        AbsXmlKeyPairJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
         assertTrue("After add one space in Attribut for cake, won't be valid yet", valid);
     }
+
 }

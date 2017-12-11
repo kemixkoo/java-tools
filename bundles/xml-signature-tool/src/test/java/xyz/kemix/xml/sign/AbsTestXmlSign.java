@@ -1,20 +1,20 @@
 package xyz.kemix.xml.sign;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import xyz.kemix.xml.XMLFileUtil;
+import xyz.kemix.xml.sign.apache.AbsXmlKeyStoreApacheSign;
+import xyz.kemix.xml.sign.jdk.AbsXmlKeyStoreJdkDomSign;
+import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
+import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -33,28 +33,37 @@ public abstract class AbsTestXmlSign extends AbsTestParent {
     protected Document loadXmlDoc(String path) throws ParserConfigurationException, SAXException, IOException {
         InputStream stream = this.getClass().getResourceAsStream(PATH_XML + path);
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(stream);
+        return XMLFileUtil.loadDoc(stream);
     }
 
     protected void console(Document doc) throws Exception {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(new DOMSource(doc), new StreamResult(System.out));
+        XMLFileUtil.consoleDoc(doc);
     }
 
     protected void file(Document doc, File file) throws Exception {
-        file.getParentFile().mkdirs();
-
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(new DOMSource(doc), new StreamResult(new FileOutputStream(file)));
+        XMLFileUtil.saveDoc(doc, file);
     }
 
     protected String getFilePart() {
         return FILE_SHOPPING_NAME + '-' + getTestName();
+    }
+
+    protected void setStore(AbsXmlKeyStoreJdkDomSign sign, URL storeUrl) throws IOException {
+        KeyStoreSetting keystoreSetting = sign.getKeystoreSetting();
+        keystoreSetting.setStoreType(KeyStoreUtil.JKS);
+        keystoreSetting.setStoreUrl(storeUrl);
+        keystoreSetting.setStorePassword(KeyStoreUtilTest.storePassword);
+        keystoreSetting.setKeyAlias(KeyStoreUtilTest.keyAlias);
+        keystoreSetting.setKeyPassword(KeyStoreUtilTest.keyPassword);
+    }
+
+    protected void setStore(AbsXmlKeyStoreApacheSign sign, URL storeUrl) {
+        KeyStoreSetting storeSetting = sign.getStoreSetting();
+        storeSetting.setStoreType(KeyStoreUtil.JKS);
+        storeSetting.setStoreUrl(storeUrl);
+        storeSetting.setStorePassword(KeyStoreUtilTest.storePassword);
+        storeSetting.setKeyAlias(KeyStoreUtilTest.keyAlias);
+        storeSetting.setKeyPassword(KeyStoreUtilTest.keyPassword);
     }
 
     protected abstract String getTestName();

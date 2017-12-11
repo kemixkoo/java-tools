@@ -26,4 +26,6 @@ public abstract class AbsXmlKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheSi
     }
 
     public abstract boolean valid(Document doc) throws Exception;
+
+    public abstract boolean validSelf(Document doc) throws Exception;
 }

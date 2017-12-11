@@ -40,3 +40,7 @@ After sign the "Data", will add the "Signature" node same level of "Data", means
 	..............
 </Signature>
 ```
+
+# NOTE
+
+1. If use DSA, must set the SignatureMethod parameter to be same, also for RSA.

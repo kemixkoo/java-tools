@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import xyz.kemix.xml.sign.IXmlSign;
-import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 
 /**
@@ -34,7 +33,7 @@ public class XmlEnvelopedKeyStoreJdkDomSignTest extends AbsTestXmlKeyStoreJdkDom
     }
 
     @Test
-    public void test_valid_keyPair_DSA() throws Exception {
+    public void test_valid_keystore_DSA() throws Exception {
         Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_dsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
@@ -43,7 +42,6 @@ public class XmlEnvelopedKeyStoreJdkDomSignTest extends AbsTestXmlKeyStoreJdkDom
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.DSA_SHA1);
 
-        sign.getKeystoreSetting().setStoreType(KeyStoreUtil.JKS);
         URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + "kemix-dsa.jks");
         setStore(sign, storeUrl);
 
@@ -52,7 +50,7 @@ public class XmlEnvelopedKeyStoreJdkDomSignTest extends AbsTestXmlKeyStoreJdkDom
     }
 
     @Test
-    public void test_valid_keyPair_RSA() throws Exception {
+    public void test_valid_keystore_RSA() throws Exception {
         Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
         assertNotNull(doc);
 
@@ -61,11 +59,30 @@ public class XmlEnvelopedKeyStoreJdkDomSignTest extends AbsTestXmlKeyStoreJdkDom
         sign.setDigestMethod(DigestMethod.SHA256);
         sign.setSignatureMethod(SignatureMethod.RSA_SHA1);
 
-        sign.getKeystoreSetting().setStoreType(KeyStoreUtil.JKS);
         URL storeUrl = this.getClass().getResource(KeyStoreUtilTest.PATH_KEYSTORE + "kemix-rsa.jks");
         setStore(sign, storeUrl);
 
         boolean valid = sign.valid(doc);
+        assertTrue("Valid failure for RSA", valid);
+    }
+
+    @Test
+    public void test_validSelf_keystore_DSA() throws Exception {
+        Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_dsa-sha1-sha512" + IXmlSign.EXT_XML);
+        assertNotNull(doc);
+
+        AbsXmlKeyStoreJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
+        assertTrue("Valid failure for DSA", valid);
+    }
+
+    @Test
+    public void test_validSelf_keystore_RSA() throws Exception {
+        Document doc = loadXmlDoc(AbsTestXmlKeyPairJdkDomSign.PATH_JDK + getFilePart() + "_rsa-sha1-sha512" + IXmlSign.EXT_XML);
+        assertNotNull(doc);
+
+        AbsXmlKeyStoreJdkDomSign sign = createJdkXmlSign();
+        boolean valid = sign.validSelf(doc);
         assertTrue("Valid failure for RSA", valid);
     }
 }

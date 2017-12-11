@@ -12,7 +12,6 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import xyz.kemix.xml.sign.AbsTestXmlSign;
 import xyz.kemix.xml.sign.IXmlSign;
 import xyz.kemix.xml.sign.jdk.key.DSAKeyPairGen;
 import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
@@ -23,9 +22,7 @@ import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsTestXmlKeyPairJdkDomSign extends AbsTestXmlSign {
-
-    static final String PATH_JDK = "jdk/";
+public abstract class AbsTestXmlKeyPairJdkDomSign extends AbsTestXmlJdkDomSign {
 
     protected abstract AbsXmlKeyPairJdkDomSign createJdkXmlSign();
 

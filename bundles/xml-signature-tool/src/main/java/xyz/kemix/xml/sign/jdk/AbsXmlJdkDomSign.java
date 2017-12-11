@@ -102,9 +102,15 @@ public abstract class AbsXmlJdkDomSign implements IXmlSign {
     }
 
     /**
-     * Valid the doc with signature value directly
+     * 
+     * Valid the doc with provided signature value
      */
     public abstract boolean valid(Document doc) throws Exception;
+
+    /**
+     * Valid the doc with signature value directly
+     */
+    public abstract boolean validSelf(Document doc) throws Exception;
 
     protected Node getSignatureNode(Document doc) {
         NodeList signList = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");

@@ -31,14 +31,18 @@ public class KeyStoreUtilTest extends AbsTestParent {
 
     public static final String PATH_KEYSTORE = "/keystore/";
 
+    public static final String PATH_DSA_JKS = PATH_KEYSTORE + "kemix-dsa.jks";
+
+    public static final String PATH_RSA_JKS = PATH_KEYSTORE + "kemix-rsa.jks";
+
     static final String storeType = KeyStoreUtil.JKS;
 
     static URL dsaStoreUrl, rsaStoreUrl;
 
     @BeforeClass
     public static void init() {
-        dsaStoreUrl = KeyStoreUtilTest.class.getResource(PATH_KEYSTORE + "kemix-dsa.jks");
-        rsaStoreUrl = KeyStoreUtilTest.class.getResource(PATH_KEYSTORE + "kemix-rsa.jks");
+        dsaStoreUrl = KeyStoreUtilTest.class.getResource(PATH_DSA_JKS);
+        rsaStoreUrl = KeyStoreUtilTest.class.getResource(PATH_RSA_JKS);
         assertNotNull(dsaStoreUrl);
         assertNotNull(rsaStoreUrl);
     }

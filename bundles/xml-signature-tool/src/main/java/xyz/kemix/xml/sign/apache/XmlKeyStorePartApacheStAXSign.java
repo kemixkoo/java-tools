@@ -12,18 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.ext.InboundXMLSec;
 import org.apache.xml.security.stax.ext.OutboundXMLSec;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -38,8 +33,12 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import xyz.kemix.xml.XMLFileUtil;
 
 /**
  * @author Kemix Koo <kemix_koo@163.com>
@@ -101,20 +100,14 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
 
     protected InputStream removeSignatureNode(InputStream inputStream) throws Exception {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(inputStream);
+            Document doc = XMLFileUtil.loadDoc(inputStream);
             Element signatureNode = getSignatureNode(doc);
             if (signatureNode != null) {
                 signatureNode.getParentNode().removeChild(signatureNode);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            //
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.transform(new DOMSource(doc), new StreamResult(baos));
+            XMLFileUtil.saveDoc(doc, baos);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
@@ -172,12 +165,49 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
     }
 
     protected boolean doValid(InputStream stream) throws Exception {
+        // load keystore
+        final KeyStore keyStore = loadKeyStore();
+        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
+
+        return validCert(stream, cert);
+    }
+
+    private QName getSignedQName(List<QName> qnames) {
+        if (qnames == null || qnames.isEmpty()) {
+            return null;
+        }
+
+        return qnames.get(qnames.size() - 1);
+    }
+
+    public boolean validSelf(InputStream stream) throws Exception {
+        Document doc = XMLFileUtil.loadDoc(stream);
+        Element signElem = XMLUtils.selectDsNode(doc.getDocumentElement().getFirstChild(), Constants._TAG_SIGNATURE, 0);
+        if (signElem == null) {
+            return false;
+        }
+        Element keyInfoElem = XMLUtils.selectDsNode(signElem.getFirstChild(), Constants._TAG_KEYINFO, 0);
+        if (keyInfoElem == null) {
+            return false;
+        }
+        KeyInfo keyInfo = new KeyInfo(keyInfoElem, null);
+
+        X509Certificate x509Certificate = keyInfo.getX509Certificate();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLFileUtil.saveDoc(doc, baos);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
+        return validCert(bais, x509Certificate);
+    }
+
+    protected boolean validCert(InputStream stream, X509Certificate cert) throws Exception {
+
         // Set up the Configuration
         XMLSecurityProperties properties = new XMLSecurityProperties();
 
         // load keystore
-        final KeyStore keyStore = loadKeyStore();
-        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
+
         properties.setSignatureVerificationKey(cert.getPublicKey());
 
         List<XMLSecurityConstants.Action> actions = new ArrayList<XMLSecurityConstants.Action>();
@@ -243,14 +273,7 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
             return false;
         }
         return true;
-    }
 
-    private QName getSignedQName(List<QName> qnames) {
-        if (qnames == null || qnames.isEmpty()) {
-            return null;
-        }
-
-        return qnames.get(qnames.size() - 1);
     }
 
 }

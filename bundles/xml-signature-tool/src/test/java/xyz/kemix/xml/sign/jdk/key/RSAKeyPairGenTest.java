@@ -6,9 +6,6 @@ import java.security.GeneralSecurityException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import xyz.kemix.xml.sign.jdk.key.KeyPairGen;
-import xyz.kemix.xml.sign.jdk.key.RSAKeyPairGen;
-
 /**
  * @author Kemix Koo <kemix_koo@163.com>
  *

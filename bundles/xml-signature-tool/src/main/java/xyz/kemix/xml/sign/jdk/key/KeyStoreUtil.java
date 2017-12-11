@@ -45,6 +45,9 @@ public class KeyStoreUtil {
     }
 
     public static PublicKey getPublicKey(URL storeUrl, String storeType, char[] storePassword, String keyAlias) throws Exception {
+        if (storeUrl == null) {
+            return null;
+        }
         final KeyStore keyStore = KeyStore.getInstance(storeType);
         InputStream openStream = storeUrl.openStream();
         try {

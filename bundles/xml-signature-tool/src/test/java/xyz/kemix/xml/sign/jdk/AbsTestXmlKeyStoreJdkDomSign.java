@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -14,9 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import xyz.kemix.xml.sign.AbsTestXmlSign;
 import xyz.kemix.xml.sign.IXmlSign;
-import xyz.kemix.xml.sign.KeyStoreSetting;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtil;
 import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
 
@@ -26,21 +23,13 @@ import xyz.kemix.xml.sign.jdk.key.KeyStoreUtilTest;
  * Created at 2017-11-30
  *
  */
-public abstract class AbsTestXmlKeyStoreJdkDomSign extends AbsTestXmlSign {
+public abstract class AbsTestXmlKeyStoreJdkDomSign extends AbsTestXmlJdkDomSign {
 
     protected abstract AbsXmlKeyStoreJdkDomSign createJdkXmlSign();
 
     @Override
     protected String getTestName() {
         return "keystore";
-    }
-
-    void setStore(AbsXmlKeyStoreJdkDomSign sign, URL storeUrl) throws IOException {
-        KeyStoreSetting keystoreSetting = sign.getKeystoreSetting();
-        keystoreSetting.setStoreUrl(storeUrl);
-        keystoreSetting.setStorePassword(KeyStoreUtilTest.storePassword);
-        keystoreSetting.setKeyAlias(KeyStoreUtilTest.keyAlias);
-        keystoreSetting.setKeyPassword(KeyStoreUtilTest.keyPassword);
     }
 
     @Test
@@ -80,8 +69,9 @@ public abstract class AbsTestXmlKeyStoreJdkDomSign extends AbsTestXmlSign {
             sign.setDigestMethod(dm);
             sign.setSignatureMethod(method);
 
-            sign.getKeystoreSetting().setStoreType(storeType);
             setStore(sign, storeUrl);
+            // must reset again
+            sign.getKeystoreSetting().setStoreType(storeType);
 
             Document signedDoc = sign.sign(doc);
 
@@ -97,7 +87,6 @@ public abstract class AbsTestXmlKeyStoreJdkDomSign extends AbsTestXmlSign {
             // file(signedDoc, new File(tempDir, name + 2 + IXmlSign.EXT_XML));
             assertTrue("Valid failure again with DigestMethod: " + dm + ", signatureMethod: " + method, valid2);
         }
-        System.out.println();
     }
 
 }

@@ -45,4 +45,6 @@ public abstract class AbsXmlKeyStoreApacheStAXSign extends AbsXmlKeyStoreApacheS
     }
 
     public abstract boolean valid(InputStream stream) throws Exception;
+
+    public abstract boolean validSelf(InputStream stream) throws Exception;
 }

@@ -40,21 +40,37 @@ public abstract class AbsXmlKeyPairJdkDomSign extends AbsXmlJdkDomSign {
         return keyInfo;
     }
 
-    /**
-     * Valid the doc with signature value directly
-     */
+    @Override
     public boolean valid(Document doc) throws Exception {
         // find signature node
         final Node signatureNode = getSignatureNode(doc);
         if (signatureNode == null) {
-            return false;
+            throw new IllegalArgumentException("Can't valid without signature node.");
+        }
+        if (getKeypair() == null) {
+            throw new IllegalArgumentException("Can't valid without key pair setting");
+        }
+        XMLSignature signature = SIGN_FACTORY.unmarshalXMLSignature(new DOMStructure(signatureNode));
+
+        PublicKey pubKey = getKeypair().getPublic();
+        // if signatureNode is in doc, ok for this also
+        DOMValidateContext valContext = new DOMValidateContext(pubKey, signatureNode);
+        // DOMValidateContext valContext = new DOMValidateContext(pubKey, doc.getDocumentElement());
+
+        return signature.validate(valContext);
+    }
+
+    @Override
+    public boolean validSelf(Document doc) throws Exception {
+        // find signature node
+        final Node signatureNode = getSignatureNode(doc);
+        if (signatureNode == null) {
+            throw new IllegalArgumentException("Can't valid without signature node.");
         }
         XMLSignature signature = SIGN_FACTORY.unmarshalXMLSignature(new DOMStructure(signatureNode));
 
         PublicKey pubKey = ((KeyValue) signature.getKeyInfo().getContent().get(0)).getPublicKey();
-        // if signatureNode is in doc, ok for this also
-        DOMValidateContext valContext = new DOMValidateContext(pubKey, signatureNode);
-        // DOMValidateContext valContext = new DOMValidateContext(pubKey, doc.getDocumentElement());
+        DOMValidateContext valContext = new DOMValidateContext(pubKey, doc.getDocumentElement());
 
         return signature.validate(valContext);
     }

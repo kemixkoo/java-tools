@@ -1,5 +1,10 @@
 package xyz.kemix.xml.sign.apache;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.InputStream;
+
 import javax.xml.namespace.QName;
 
 import org.junit.Test;
@@ -50,5 +55,18 @@ public class XmlKeyStorePartApacheStAXSignTest extends AbsTestXmlKeyStoreApacheS
     @Test
     public void test_valid_format() throws Exception {
         doTestValid_PaymentInfo(PATH_APACHE + getFilePart() + "-format" + IXmlSign.EXT_XML, false);
+    }
+
+    @Test
+    public void test_validSelf() throws Exception {
+        InputStream stream = this.getClass().getResourceAsStream(PATH_XML + PATH_APACHE + getFilePart() + IXmlSign.EXT_XML);
+        assertNotNull(stream);
+
+        XmlKeyStorePartApacheStAXSign sign = new XmlKeyStorePartApacheStAXSign();
+
+        sign.getNamesToSign().add(new QName("http://www.kemix.xyz/2017/xmlsign#", "PaymentInfo"));
+
+        boolean valid = sign.validSelf(stream);
+        assertTrue("No need the key pair, just valid by the signature with keys", valid);
     }
 }
