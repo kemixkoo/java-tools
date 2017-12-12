@@ -1,5 +1,11 @@
 package xyz.kemix.xml.sign.apache;
 
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -25,7 +31,28 @@ public abstract class AbsXmlKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheSi
         }
     }
 
-    public abstract boolean valid(Document doc) throws Exception;
+    public boolean valid(Document doc) throws Exception {
+        // load keystore
+        final KeyStore keyStore = loadKeyStore();
+        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
+        return validCert(doc, cert);
+    }
 
-    public abstract boolean validSelf(Document doc) throws Exception;
+    public boolean validSelf(Document doc) throws Exception {
+        final Element signElem = getSignatureNode(doc);
+        if (signElem == null) {
+            return false;
+        }
+        Element keyInfoElem = XMLUtils.selectDsNode(signElem.getFirstChild(), Constants._TAG_KEYINFO, 0);
+        if (keyInfoElem == null) {
+            return false;
+        }
+        KeyInfo keyInfo = new KeyInfo(keyInfoElem, null);
+
+        X509Certificate x509Certificate = keyInfo.getX509Certificate();
+
+        return validCert(doc, x509Certificate);
+    }
+
+    protected abstract boolean validCert(Document doc, X509Certificate cert) throws Exception;
 }

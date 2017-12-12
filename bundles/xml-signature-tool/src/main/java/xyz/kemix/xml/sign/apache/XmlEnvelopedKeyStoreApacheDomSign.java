@@ -62,16 +62,17 @@ public class XmlEnvelopedKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheDomSi
         return doc;
     }
 
-    public boolean valid(Document doc) throws Exception {
-        // create XMLSignature
+    protected boolean validCert(Document doc, X509Certificate cert) throws Exception {
         final Element sigElement = getSignatureNode(doc);
         if (sigElement == null) {
-            return false;
+            return false; // if no sign node
         }
+
+        // create XMLSignature
         String baseUrl = "";
         XMLSignature signature = new XMLSignature(sigElement, baseUrl);
 
-        // set for signed elements
+        // set for signed nodes
         NodeList childNodes = doc.getDocumentElement().getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
@@ -84,17 +85,6 @@ public class XmlEnvelopedKeyStoreApacheDomSign extends AbsXmlKeyStoreApacheDomSi
             }
         }
 
-        // load keystore
-        final KeyStore keyStore = KeyStore.getInstance(getStoreSetting().getStoreType());
-        keyStore.load(getStoreSetting().getStoreUrl().openStream(), getStoreSetting().getStorePassword());
-        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
-
         return signature.checkSignatureValue(cert);
     }
-
-    @Override
-    public boolean validSelf(Document doc) throws Exception {
-        return false;
-    }
-
 }

@@ -182,7 +182,7 @@ public class XmlKeyStorePartApacheStAXSign extends AbsXmlKeyStoreApacheStAXSign 
 
     public boolean validSelf(InputStream stream) throws Exception {
         Document doc = XMLFileUtil.loadDoc(stream);
-        Element signElem = XMLUtils.selectDsNode(doc.getDocumentElement().getFirstChild(), Constants._TAG_SIGNATURE, 0);
+        final Element signElem = getSignatureNode(doc);
         if (signElem == null) {
             return false;
         }

@@ -78,7 +78,7 @@ public class XmlEnvelopedKeyStorePartApacheDomSign extends AbsXmlKeyStoreApacheD
         return doc;
     }
 
-    public boolean valid(Document doc) throws Exception {
+    protected boolean validCert(Document doc, X509Certificate cert) throws Exception {
         // create XMLSignature
         final Element sigElement = getSignatureNode(doc);
         if (sigElement == null) {
@@ -97,16 +97,7 @@ public class XmlEnvelopedKeyStorePartApacheDomSign extends AbsXmlKeyStoreApacheD
             signedElement.setIdAttributeNS(null, Constants._ATT_ID, true);
         }
 
-        // load keystore
-        final KeyStore keyStore = loadKeyStore();
-        final X509Certificate cert = (X509Certificate) keyStore.getCertificate(getStoreSetting().getKeyAlias());
-
         return signature.checkSignatureValue(cert);
-    }
-
-    @Override
-    public boolean validSelf(Document doc) throws Exception {
-        return false;
     }
 
 }

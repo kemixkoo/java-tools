@@ -134,4 +134,15 @@ public abstract class AbsTestXmlEnvelopedKeyStoreApacheDomSign extends AbsTestXm
             assertTrue("Valid failure when sign again for " + signatureMethod, valid2);
         }
     }
+
+    @Test
+    public void test_validSelf() throws Exception {
+        Document doc = loadXmlDoc(PATH_APACHE + getFilePart() + "_dsa-sha256-sha1" + IXmlSign.EXT_XML);
+        assertNotNull(doc);
+
+        AbsXmlKeyStoreApacheDomSign sign = createSign();
+        setKeyStoreSettings(sign);
+        boolean valid = sign.validSelf(doc);
+        assertTrue("No need the key pair, just valid by the signature with keys", valid);
+    }
 }
